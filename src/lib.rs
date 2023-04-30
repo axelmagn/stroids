@@ -1,0 +1,9 @@
+use wasm_bindgen::prelude::wasm_bindgen;
+
+mod app;
+mod player;
+
+#[wasm_bindgen]
+pub fn run_app() {
+    app::run();
+}

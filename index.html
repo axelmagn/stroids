@@ -1,0 +1,48 @@
+<!DOCTYPE html>
+<html lang="en-US">
+
+<head>
+	<meta charset="utf-8" />
+	<title>Stroids</title>
+</head>
+
+<style>
+	body {
+		margin: 0;
+		background: #a6a6a6;
+		background-size: 400% 400%;
+		height: 100vh;
+		display: flex;
+		justify-content: center;
+		align-items: center;
+	}
+
+	canvas {
+		background-color: white;
+	}
+
+	@keyframes gradient {
+		0% {
+			background-position: 0% 50%;
+		}
+
+		50% {
+			background-position: 100% 50%;
+		}
+
+		100% {
+			background-position: 0% 50%;
+		}
+	}
+</style>
+
+<body>
+	<script type="module">
+		import init, { run_app } from "./pkg/stroids.js";
+		init().then(() => {
+			run_app();
+		});
+	</script>
+</body>
+
+</html>

@@ -1,32 +1,29 @@
 use bevy::{
-    prelude::{App, Camera2dBundle, ClearColor, Color, Commands, PluginGroup},
+    prelude::{App, ClearColor, Commands, PluginGroup, Res},
     utils::default,
-    window::{Window, WindowPlugin},
     DefaultPlugins,
 };
 
-use crate::player::plugin::PlayerPlugin;
+use crate::{config::Config, input::InputPlugin, player::PlayerPlugin, ship::ShipPlugin};
 
 pub fn run() {
+    // load config
+    // TODO: maybe it makes sense to load dynamically from assets? That way I'm not recompiling as often.
+    let config: Config = default();
+    let clear_color = config.background_color();
+    let window_plugin = config.window_plugin();
+    // run app
     App::new()
-        .insert_resource(ClearColor(Color::rgb(0.9, 0.3, 0.6)))
-        .add_plugins(DefaultPlugins.set(WindowPlugin {
-            primary_window: Some(Window {
-                title: "Stroids".into(),
-                resolution: (800., 600.).into(),
-                // Tells wasm to resize the window according to the available canvas
-                fit_canvas_to_parent: false,
-                // Tells wasm not to override default event handling, like F5, Ctrl+R etc.
-                prevent_default_event_handling: false,
-                ..default()
-            }),
-            ..default()
-        }))
+        .insert_resource(config)
+        .insert_resource(ClearColor(clear_color))
+        .add_plugins(DefaultPlugins.set(window_plugin))
+        .add_plugin(InputPlugin)
         .add_plugin(PlayerPlugin)
-        .add_startup_system(setup_camera)
+        .add_plugin(ShipPlugin)
+        .add_startup_system(spawn_camera_system)
         .run();
 }
 
-fn setup_camera(mut commands: Commands) {
-    commands.spawn(Camera2dBundle::default());
+fn spawn_camera_system(mut commands: Commands, config: Res<Config>) {
+    commands.spawn(config.camera());
 }

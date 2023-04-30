@@ -23,5 +23,7 @@ lto = "thin"
 
 [dependencies]
 bevy = "0.10.1"
+clap = { version = "4.2.5", features = ["derive"] }
 serde = "1.0.160"
+toml = "0.7.3"
 wasm-bindgen = "0.2.84"

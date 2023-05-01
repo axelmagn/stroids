@@ -1,16 +1,20 @@
 use bevy::{
     math::Vec3Swizzles,
-    prelude::{Bundle, Component, Plugin, Query, Res, Transform, Vec2, Vec3},
+    prelude::{
+        Bundle, Component, IntoSystemConfig, OnUpdate, Plugin, Query, Res, Transform, Vec2, Vec3,
+    },
     sprite::SpriteBundle,
     time::Time,
 };
+
+use crate::app::AppState;
 
 pub struct ShipPlugin;
 
 impl Plugin for ShipPlugin {
     fn build(&self, app: &mut bevy::prelude::App) {
-        app.add_system(apply_ship_controls_system);
-        app.add_system(update_ship_physics_system);
+        app.add_system(apply_ship_controls_system.in_set(OnUpdate(AppState::InGame)));
+        app.add_system(update_ship_physics_system.in_set(OnUpdate(AppState::InGame)));
     }
 }
 
@@ -33,7 +37,7 @@ pub struct ShipConfig {
 impl Default for ShipConfig {
     fn default() -> Self {
         Self {
-            thrust_factor: 300.0,
+            thrust_factor: 400.0,
             turn_factor: 7.0,
             velocity_damping: 0.3,
             rotation_rate_damping: 0.7,

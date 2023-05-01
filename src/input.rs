@@ -2,15 +2,17 @@
 
 use bevy::{
     input::{keyboard::KeyboardInput, ButtonState},
-    prelude::{EventReader, EventWriter, KeyCode, Plugin},
+    prelude::{EventReader, EventWriter, IntoSystemConfig, KeyCode, OnUpdate, Plugin},
 };
+
+use crate::app::AppState;
 
 pub struct InputPlugin;
 
 impl Plugin for InputPlugin {
     fn build(&self, app: &mut bevy::prelude::App) {
         app.add_event::<InputEvent>();
-        app.add_system(keyboard_input_system);
+        app.add_system(keyboard_input_system.in_set(OnUpdate(AppState::InGame)));
     }
 }
 

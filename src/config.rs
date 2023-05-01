@@ -2,7 +2,7 @@ use std::str::from_utf8;
 
 use bevy::{
     asset::{AssetLoader, LoadContext, LoadedAsset},
-    prelude::{Camera2dBundle, Color, OrthographicProjection, Resource},
+    prelude::{AddAsset, Camera2dBundle, Color, OrthographicProjection, Plugin, Resource},
     reflect::TypeUuid,
     utils::{default, BoxedFuture},
     window::{Window, WindowPlugin},
@@ -11,7 +11,16 @@ use serde::Deserialize;
 
 const DEFAULT_CONFIG_STR: &'static str = include_str!("include_data/default_config.toml");
 
-#[derive(Deserialize, Debug, TypeUuid, Resource)]
+pub struct ConfigPlugin;
+
+impl Plugin for ConfigPlugin {
+    fn build(&self, app: &mut bevy::prelude::App) {
+        app.add_asset::<Config>();
+        app.init_asset_loader::<ConfigLoader>();
+    }
+}
+
+#[derive(Deserialize, Debug, TypeUuid, Resource, Clone)]
 #[uuid = "4f602f8f-3160-4369-a4c4-062a031ad23b"]
 pub struct Config {
     pub assets: AssetsConfig,
@@ -19,12 +28,12 @@ pub struct Config {
     pub camera: CameraConfig,
 }
 
-#[derive(Deserialize, Debug)]
+#[derive(Deserialize, Debug, Clone)]
 pub struct AssetsConfig {
     pub player_ship: String,
 }
 
-#[derive(Deserialize, Debug)]
+#[derive(Deserialize, Debug, Clone)]
 pub struct WindowConfig {
     title: String,
     fit_canvas_to_parent: bool,
@@ -33,7 +42,7 @@ pub struct WindowConfig {
     background_color: String,
 }
 
-#[derive(Deserialize, Debug)]
+#[derive(Deserialize, Debug, Clone)]
 pub struct CameraConfig {
     pub scale: f32,
 }
@@ -107,7 +116,7 @@ impl AssetLoader for ConfigLoader {
         Box::pin(async move {
             // TODO: handle error
             let config_str = from_utf8(bytes)?;
-            let config = toml::from_str(&config_str)?;
+            let config: Config = toml::from_str(&config_str)?;
             load_context.set_default_asset(LoadedAsset::new(config));
             Ok(())
         })

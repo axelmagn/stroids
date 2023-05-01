@@ -1,11 +1,13 @@
 use bevy::{
     input::ButtonState,
     prelude::{
-        App, AssetServer, Bundle, Commands, Component, EventReader, Plugin, Query, Res, With,
+        App, AssetServer, Bundle, Commands, Component, EventReader, IntoSystemAppConfig,
+        IntoSystemConfig, OnEnter, OnUpdate, Plugin, Query, Res, With,
     },
 };
 
 use crate::{
+    app::AppState,
     config::Config,
     input::{InputAction, InputEvent},
     ship::{ShipBundle, ShipControls},
@@ -15,8 +17,8 @@ pub struct PlayerPlugin;
 
 impl Plugin for PlayerPlugin {
     fn build(&self, app: &mut App) {
-        app.add_startup_system(spawn_player_system);
-        app.add_system(handle_player_input_system);
+        app.add_system(spawn_player_system.in_schedule(OnEnter(AppState::InGame)));
+        app.add_system(handle_player_input_system.in_set(OnUpdate(AppState::InGame)));
     }
 }
 

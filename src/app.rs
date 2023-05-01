@@ -1,17 +1,10 @@
 use bevy::{
-    prelude::{
-        App, Camera2dBundle, ClearColor, Color, Commands, IntoSystemAppConfig, PluginGroup, Res,
-        States,
-    },
-    utils::default,
+    prelude::{App, ClearColor, Color, States},
     DefaultPlugins,
 };
 
 use crate::{
-    config::{Config, ConfigPlugin},
-    input::InputPlugin,
-    loading::LoadingPlugin,
-    player::PlayerPlugin,
+    config::ConfigPlugin, input::InputPlugin, loading::LoadingPlugin, player::PlayerPlugin,
     ship::ShipPlugin,
 };
 
@@ -35,14 +28,9 @@ pub enum AppState {
 }
 
 pub fn run() {
-    // load config
-    // TODO: maybe it makes sense to load dynamically from assets? That way I'm not recompiling as often.
-    let config: Config = default();
-    let clear_color = config.background_color();
-    let window_plugin = config.window_plugin();
     // run app
     App::new()
-        .add_plugins(DefaultPlugins.set(window_plugin))
+        .add_plugins(DefaultPlugins)
         .add_state::<AppState>()
         .insert_resource(ClearColor(Color::BLACK))
         .add_plugin(ConfigPlugin)
@@ -50,10 +38,5 @@ pub fn run() {
         .add_plugin(PlayerPlugin)
         .add_plugin(ShipPlugin)
         .add_plugin(LoadingPlugin)
-        .add_system(spawn_camera_system.on_startup())
         .run();
-}
-
-fn spawn_camera_system(mut commands: Commands) {
-    commands.spawn(Camera2dBundle::default());
 }

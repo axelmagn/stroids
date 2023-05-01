@@ -6,10 +6,10 @@
 use bevy::{
     asset::LoadState,
     prelude::{
-        info, AssetServer, Assets, Color, Commands, Entity, Handle, IntoSystemAppConfig,
+        AssetServer, Assets, Color, Commands, Entity, Handle, IntoSystemAppConfig,
         IntoSystemConfig, NextState, OnEnter, OnExit, OnUpdate, Plugin, Res, ResMut, Resource,
     },
-    text::{Font, Text, Text2dBundle, TextStyle},
+    text::{Text, Text2dBundle, TextStyle},
     utils::default,
 };
 

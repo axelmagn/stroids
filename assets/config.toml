@@ -1,8 +1,7 @@
-# named assets
 [assets]
 player_ship = "space_shooter/Player/playerShip1_orange.png"
 
-[window]
+[viewport]
 title = "Stroids"
 resolution = [800, 600]
 # Tells wasm to resize the window according to the available canvas
@@ -10,6 +9,4 @@ fit_canvas_to_parent = false
 # Tells wasm not to override default event handling, like F5, Ctrl+R etc.
 prevent_default_event_handling = false
 background_color = "#111122"
-
-[camera]
-scale = 3
+camera_scale = 3.0

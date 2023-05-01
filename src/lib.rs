@@ -6,6 +6,7 @@ mod input;
 mod loading;
 mod player;
 mod ship;
+mod viewport;
 
 #[wasm_bindgen]
 pub fn run_app() {

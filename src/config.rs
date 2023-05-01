@@ -2,14 +2,13 @@ use std::str::from_utf8;
 
 use bevy::{
     asset::{AssetLoader, LoadContext, LoadedAsset},
-    prelude::{AddAsset, Camera2dBundle, Color, OrthographicProjection, Plugin, Resource},
+    prelude::{AddAsset, Commands, DetectChanges, Plugin, Res, Resource},
     reflect::TypeUuid,
-    utils::{default, BoxedFuture},
-    window::{Window, WindowPlugin},
+    utils::BoxedFuture,
 };
 use serde::Deserialize;
 
-const DEFAULT_CONFIG_STR: &'static str = include_str!("include_data/default_config.toml");
+use crate::viewport::ViewportConfig;
 
 pub struct ConfigPlugin;
 
@@ -17,6 +16,7 @@ impl Plugin for ConfigPlugin {
     fn build(&self, app: &mut bevy::prelude::App) {
         app.add_asset::<Config>();
         app.init_asset_loader::<ConfigLoader>();
+        app.add_system(Config::system_handle_config_change);
     }
 }
 
@@ -24,8 +24,7 @@ impl Plugin for ConfigPlugin {
 #[uuid = "4f602f8f-3160-4369-a4c4-062a031ad23b"]
 pub struct Config {
     pub assets: AssetsConfig,
-    pub window: WindowConfig,
-    pub camera: CameraConfig,
+    pub viewport: ViewportConfig,
 }
 
 #[derive(Deserialize, Debug, Clone)]
@@ -33,74 +32,18 @@ pub struct AssetsConfig {
     pub player_ship: String,
 }
 
-#[derive(Deserialize, Debug, Clone)]
-pub struct WindowConfig {
-    title: String,
-    fit_canvas_to_parent: bool,
-    prevent_default_event_handling: bool,
-    resolution: [f32; 2],
-    background_color: String,
-}
-
-#[derive(Deserialize, Debug, Clone)]
-pub struct CameraConfig {
-    pub scale: f32,
-}
-
 impl Config {
-    pub fn window_plugin(&self) -> WindowPlugin {
-        WindowPlugin {
-            primary_window: Some(Window {
-                title: self.window.title.clone(),
-                resolution: self.window.resolution.into(),
-                fit_canvas_to_parent: self.window.fit_canvas_to_parent,
-                prevent_default_event_handling: self.window.prevent_default_event_handling,
-                ..default()
-            }),
-            ..default()
+    pub fn system_handle_config_change(mut commands: Commands, opt_config: Option<Res<Config>>) {
+        if opt_config.is_none() {
+            return;
         }
-    }
-
-    pub fn background_color(&self) -> Color {
-        Color::hex(&self.window.background_color).unwrap()
-    }
-
-    pub fn camera(&self) -> Camera2dBundle {
-        Camera2dBundle {
-            projection: OrthographicProjection {
-                scale: self.camera.scale,
-                ..default()
-            },
-            ..default()
+        let config = opt_config.unwrap();
+        if !config.is_changed() {
+            return;
         }
-    }
-}
 
-impl Default for Config {
-    fn default() -> Self {
-        toml::from_str(DEFAULT_CONFIG_STR).expect("Could not parse default config")
-    }
-}
-
-#[cfg(test)]
-mod tests {
-    use super::*;
-
-    #[test]
-    fn test_config_window_plugin_succeeds() {
-        let window_plugin = Config::default().window_plugin();
-        assert!(window_plugin.primary_window.is_some());
-    }
-
-    #[test]
-    fn test_config_background_color_succeeds() {
-        let _color = Config::default().background_color();
-    }
-
-    #[test]
-    fn test_config_default_succeeds() {
-        let config = Config::default();
-        assert!(!config.assets.player_ship.is_empty());
+        // insert all resources derived from config
+        commands.insert_resource(config.viewport.clone());
     }
 }
 

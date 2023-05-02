@@ -6,6 +6,7 @@ use bevy::{
     sprite::SpriteBundle,
     time::Time,
 };
+use serde::Deserialize;
 
 use crate::app::AppState;
 
@@ -26,14 +27,16 @@ pub struct ShipControls {
     pub turn: f32,
 }
 
-#[derive(Component, Debug)]
+#[derive(Component, Clone, Debug, Deserialize)]
 pub struct ShipConfig {
     pub thrust_factor: f32,
     pub turn_factor: f32,
     pub velocity_damping: f32,
     pub rotation_rate_damping: f32,
+    pub sprite_id: String,
 }
 
+// TODO: delete
 impl Default for ShipConfig {
     fn default() -> Self {
         Self {
@@ -41,6 +44,7 @@ impl Default for ShipConfig {
             turn_factor: 7.0,
             velocity_damping: 0.3,
             rotation_rate_damping: 0.7,
+            sprite_id: "".to_string(),
         }
     }
 }
@@ -78,13 +82,6 @@ pub fn apply_ship_controls_system(
         let accel_mag = controls.thrust * config.thrust_factor * dt;
         let accel = accel_dir * accel_mag;
         state.velocity += accel;
-
-        // DEBUG
-        // info!("controls: {:?}", controls);
-        // info!("state: {:?}", state);
-        // info!("accel_dir: {:?}", accel_dir);
-        // info!("accel_mag: {:?}", accel_mag);
-        // info!("accel: {:?}", accel);
     }
 }
 

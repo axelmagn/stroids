@@ -2,15 +2,16 @@ use bevy::{
     input::ButtonState,
     prelude::{
         App, AssetServer, Bundle, Commands, Component, EventReader, IntoSystemAppConfig,
-        IntoSystemConfig, OnEnter, OnUpdate, Plugin, Query, Res, With,
+        IntoSystemConfig, OnEnter, OnUpdate, Plugin, Query, Res, Resource, With,
     },
 };
+use serde::Deserialize;
 
 use crate::{
     app::AppState,
     config::Config,
     input::{InputAction, InputEvent},
-    ship::{ShipBundle, ShipControls},
+    ship::{ShipBundle, ShipConfig, ShipControls},
 };
 
 pub struct PlayerPlugin;
@@ -31,6 +32,11 @@ pub struct PlayerInputMemory {
     pub turn: Option<InputEvent>,
 }
 
+#[derive(Component, Clone, Debug, Deserialize, Resource)]
+pub struct PlayerConfig {
+    pub ship: ShipConfig,
+}
+
 #[derive(Bundle, Default)]
 pub struct PlayerBundle {
     _p: PlayerMarker,
@@ -41,7 +47,8 @@ pub struct PlayerBundle {
 }
 
 pub fn spawn_player_system(mut commands: Commands, assets: Res<AssetServer>, config: Res<Config>) {
-    let sprite_path = &config.assets.player_ship;
+    // TODO: use player config
+    let sprite_path = &config.assets.images["player_ship"];
     let mut player = PlayerBundle::default();
     player.ship.sprite.texture = assets.load(sprite_path);
     commands.spawn(player);

@@ -2,13 +2,13 @@ use std::str::from_utf8;
 
 use bevy::{
     asset::{AssetLoader, LoadContext, LoadedAsset},
-    prelude::{AddAsset, Commands, DetectChanges, Plugin, Res, Resource},
+    prelude::{info, AddAsset, Commands, DetectChanges, Plugin, Res, Resource},
     reflect::TypeUuid,
-    utils::BoxedFuture,
+    utils::{BoxedFuture, HashMap},
 };
 use serde::Deserialize;
 
-use crate::viewport::ViewportConfig;
+use crate::{loading::AssetsConfig, player::PlayerConfig, viewport::ViewportConfig};
 
 pub struct ConfigPlugin;
 
@@ -24,12 +24,8 @@ impl Plugin for ConfigPlugin {
 #[uuid = "4f602f8f-3160-4369-a4c4-062a031ad23b"]
 pub struct Config {
     pub assets: AssetsConfig,
+    pub player: PlayerConfig,
     pub viewport: ViewportConfig,
-}
-
-#[derive(Deserialize, Debug, Clone)]
-pub struct AssetsConfig {
-    pub player_ship: String,
 }
 
 impl Config {
@@ -42,8 +38,12 @@ impl Config {
             return;
         }
 
+        info!("Config updated");
+
         // insert all resources derived from config
+        commands.insert_resource(config.assets.clone());
         commands.insert_resource(config.viewport.clone());
+        commands.insert_resource(config.player.clone());
     }
 }
 

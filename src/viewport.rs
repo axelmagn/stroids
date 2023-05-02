@@ -45,7 +45,7 @@ impl ViewportConfig {
         if !viewport_config.is_changed() {
             return;
         }
-        info!("Viewport Config Changed:\n{:?}", viewport_config);
+        info!("ViewportConfig updated");
         // propagate config changes to viewport
         // update window
         let mut window = windows.single_mut();

@@ -5,7 +5,7 @@ use bevy::{
 
 use crate::{
     config::ConfigPlugin, input::InputPlugin, loading::LoadingPlugin, player::PlayerPlugin,
-    ship::ShipPlugin,
+    ship::ShipPlugin, viewport::ViewportPlugin,
 };
 
 /// Application State.  during development, not all of these will be implemented yet.
@@ -38,5 +38,6 @@ pub fn run() {
         .add_plugin(PlayerPlugin)
         .add_plugin(ShipPlugin)
         .add_plugin(LoadingPlugin)
+        .add_plugin(ViewportPlugin)
         .run();
 }

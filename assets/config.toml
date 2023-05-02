@@ -1,5 +1,13 @@
-[assets]
+[assets.images]
 player_ship = "space_shooter/Player/playerShip1_orange.png"
+
+[player.ship]
+thrust_factor = 350.0
+turn_factor = 7.0
+velocity_damping = 0.3
+rotation_rate_damping = 0.7
+sprite_id = "player_ship"
+
 
 [viewport]
 title = "Stroids"

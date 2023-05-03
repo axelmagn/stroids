@@ -3,6 +3,15 @@ player_ship_blue = "space_shooter/Player/playerShip1_blue.png"
 player_ship_green = "space_shooter/Player/playerShip1_green.png"
 player_ship_orange = "space_shooter/Player/playerShip1_orange.png"
 player_ship_red = "space_shooter/Player/playerShip1_red.png"
+laser_red = "space_shooter/Lasers/laserRed07.png"
+meteor_brown_lg_01 = "space_shooter/Meteors/meteorBrown_big1.png"
+meteor_brown_lg_02 = "space_shooter/Meteors/meteorBrown_big2.png"
+meteor_brown_lg_03 = "space_shooter/Meteors/meteorBrown_big3.png"
+meteor_brown_lg_04 = "space_shooter/Meteors/meteorBrown_big4.png"
+meteor_brown_md_01 = "space_shooter/Meteors/meteorBrown_med1.png"
+meteor_brown_md_02 = "space_shooter/Meteors/meteorBrown_med3.png"
+meteor_brown_sm_01 = "space_shooter/Meteors/meteorBrown_small1.png"
+meteor_brown_sm_02 = "space_shooter/Meteors/meteorBrown_small2.png"
 
 [player.ship]
 thrust_factor = 800.0

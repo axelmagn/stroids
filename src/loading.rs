@@ -57,27 +57,31 @@ struct AssetsLoading(Vec<HandleUntyped>);
 struct TitleTextMarker;
 
 #[derive(Debug, Clone, Component)]
+struct StateTextMarker;
+
+#[derive(Debug, Clone, Component)]
 struct StatusTextMarker;
 
 /// Initiate asset preloading
 fn system_preload_setup(mut commands: Commands, asset_server: Res<AssetServer>) {
     // load font
     let font = asset_server.load("fira_sans/FiraSans-Regular.ttf");
-    let text_style = TextStyle {
+    commands.insert_resource(LoadingFont(font.clone()));
+
+    // display title text
+    let title_text_style = TextStyle {
         font: font.clone(),
-        font_size: 128.0,
+        font_size: 256.0,
         color: Color::WHITE,
     };
-    commands.insert_resource(LoadingFont(font));
-
-    // display state text
     commands.spawn((
         Text2dBundle {
-            text: Text::from_section("Loading", text_style),
+            text: Text::from_section("Stroids", title_text_style),
             ..default()
         },
-        TitleTextMarker,
+        StateTextMarker,
     ));
+
     // start loading config
     let config_handle: Handle<Config> = asset_server.load(CONFIG_ASSET_PATH);
 
@@ -139,7 +143,25 @@ fn system_loading_setup(
     // insert loading tracker as a resource
     commands.insert_resource(loading);
 
-    let text_style = TextStyle {
+    // display state text
+    let state_text_style = TextStyle {
+        font: loading_font.0.clone(),
+        font_size: 128.0,
+        color: Color::WHITE,
+    };
+    commands.spawn((
+        Text2dBundle {
+            text: Text::from_section("Loading", state_text_style),
+            transform: Transform {
+                translation: Vec3::new(0., -128., 0.),
+                ..default()
+            },
+            ..default()
+        },
+        StateTextMarker,
+    ));
+
+    let status_text_style = TextStyle {
         font: loading_font.0.clone(),
         font_size: 64.0,
         color: Color::WHITE,
@@ -148,8 +170,8 @@ fn system_loading_setup(
     // spawn status text
     commands.spawn((
         Text2dBundle {
-            text: Text::from_section("", text_style),
-            transform: Transform::from_translation(Vec3::new(0., -100., 0.)),
+            text: Text::from_section("", status_text_style),
+            transform: Transform::from_translation(Vec3::new(0., -256., 0.)),
             ..default()
         },
         StatusTextMarker,
@@ -189,10 +211,10 @@ fn system_loading_update(
 
 fn system_loading_cleanup(
     mut commands: Commands,
-    title_text: Query<Entity, With<TitleTextMarker>>,
+    state_text: Query<Entity, With<StateTextMarker>>,
     status_text: Query<Entity, With<StatusTextMarker>>,
 ) {
-    title_text.iter().for_each(|e| commands.entity(e).despawn());
+    state_text.iter().for_each(|e| commands.entity(e).despawn());
     status_text
         .iter()
         .for_each(|e| commands.entity(e).despawn());

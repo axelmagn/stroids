@@ -1,16 +1,17 @@
 use bevy::{
     input::ButtonState,
     prelude::{
-        App, AssetServer, Bundle, Commands, Component, EventReader, IntoSystemAppConfig,
+        App, Bundle, Commands, Component, EventReader, Image, IntoSystemAppConfig,
         IntoSystemConfig, OnEnter, OnUpdate, Plugin, Query, Res, Resource, With,
     },
+    utils::default,
 };
 use serde::Deserialize;
 
 use crate::{
     app::AppState,
-    config::Config,
     input::{InputAction, InputEvent},
+    loading::AssetMap,
     ship::{ShipBundle, ShipConfig, ShipControls},
 };
 
@@ -32,25 +33,36 @@ pub struct PlayerInputMemory {
     pub turn: Option<InputEvent>,
 }
 
-#[derive(Component, Clone, Debug, Deserialize, Resource)]
+#[derive(Clone, Debug, Deserialize, Resource)]
 pub struct PlayerConfig {
     pub ship: ShipConfig,
 }
 
 #[derive(Bundle, Default)]
 pub struct PlayerBundle {
-    _p: PlayerMarker,
+    marker: PlayerMarker,
     input_memory: PlayerInputMemory,
 
     #[bundle]
     ship: ShipBundle,
 }
 
-pub fn spawn_player_system(mut commands: Commands, assets: Res<AssetServer>, config: Res<Config>) {
-    // TODO: use player config
-    let sprite_path = &config.assets.images["player_ship"];
-    let mut player = PlayerBundle::default();
-    player.ship.sprite.texture = assets.load(sprite_path);
+pub fn spawn_player_system(
+    mut commands: Commands,
+    loaded_images: Res<AssetMap<Image>>,
+    config: Res<PlayerConfig>,
+) {
+    // TODO: get ShipBundle from ShipConfig
+    let mut player = PlayerBundle {
+        ship: ShipBundle {
+            config: config.ship.clone(),
+            ..default()
+        },
+        ..default()
+    };
+    let sprite_id = &config.ship.sprite_id;
+    let err_msg = format!("Could not find player sprite: {}", sprite_id);
+    player.ship.sprite.texture = loaded_images.0.get(sprite_id).expect(&err_msg).clone();
     commands.spawn(player);
 }
 

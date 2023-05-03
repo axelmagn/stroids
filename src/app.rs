@@ -2,6 +2,7 @@ use bevy::{
     prelude::{App, ClearColor, Color, States},
     DefaultPlugins,
 };
+use bevy_inspector_egui::quick::WorldInspectorPlugin;
 
 use crate::{
     config::ConfigPlugin, input::InputPlugin, loading::LoadingPlugin, player::PlayerPlugin,
@@ -30,14 +31,15 @@ pub enum AppState {
 pub fn run() {
     // run app
     App::new()
-        .add_plugins(DefaultPlugins)
         .add_state::<AppState>()
-        .insert_resource(ClearColor(Color::BLACK))
+        .add_plugins(DefaultPlugins)
+        .add_plugin(WorldInspectorPlugin::new())
         .add_plugin(ConfigPlugin)
         .add_plugin(InputPlugin)
         .add_plugin(PlayerPlugin)
         .add_plugin(ShipPlugin)
         .add_plugin(LoadingPlugin)
         .add_plugin(ViewportPlugin)
+        .insert_resource(ClearColor(Color::BLACK))
         .run();
 }

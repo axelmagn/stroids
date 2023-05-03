@@ -22,7 +22,8 @@ opt-level = 's'
 lto = "thin"
 
 [dependencies]
-bevy = "0.10.1"
+bevy = { version = "0.10.1", features = ["subpixel_glyph_atlas"] }
+bevy-inspector-egui = "0.18.3"
 clap = { version = "4.2.5", features = ["derive"] }
 serde = "1.0.160"
 toml = "0.7.3"

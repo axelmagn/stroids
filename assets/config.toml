@@ -1,12 +1,15 @@
 [assets.images]
-player_ship = "space_shooter/Player/playerShip1_orange.png"
+player_ship_blue = "space_shooter/Player/playerShip1_blue.png"
+player_ship_green = "space_shooter/Player/playerShip1_green.png"
+player_ship_orange = "space_shooter/Player/playerShip1_orange.png"
+player_ship_red = "space_shooter/Player/playerShip1_red.png"
 
 [player.ship]
-thrust_factor = 350.0
-turn_factor = 7.0
-velocity_damping = 0.3
-rotation_rate_damping = 0.7
-sprite_id = "player_ship"
+thrust_factor = 800.0
+turn_factor = 40.0
+velocity_damping = 0.8
+rotation_rate_damping = 8.0
+sprite_id = "player_ship_orange"
 
 
 [viewport]

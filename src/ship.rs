@@ -3,6 +3,7 @@ use bevy::{
     prelude::{
         Bundle, Component, IntoSystemConfig, OnUpdate, Plugin, Query, Res, Transform, Vec2, Vec3,
     },
+    reflect::Reflect,
     sprite::SpriteBundle,
     time::Time,
 };
@@ -14,12 +15,15 @@ pub struct ShipPlugin;
 
 impl Plugin for ShipPlugin {
     fn build(&self, app: &mut bevy::prelude::App) {
+        app.register_type::<ShipControls>();
+        app.register_type::<ShipConfig>();
+        app.register_type::<ShipState>();
         app.add_system(apply_ship_controls_system.in_set(OnUpdate(AppState::InGame)));
         app.add_system(update_ship_physics_system.in_set(OnUpdate(AppState::InGame)));
     }
 }
 
-#[derive(Component, Default, Debug)]
+#[derive(Reflect, Component, Default, Debug)]
 pub struct ShipControls {
     /// thrust input [-1,1]
     pub thrust: f32,
@@ -27,7 +31,7 @@ pub struct ShipControls {
     pub turn: f32,
 }
 
-#[derive(Component, Clone, Debug, Deserialize)]
+#[derive(Reflect, Component, Clone, Debug, Deserialize)]
 pub struct ShipConfig {
     pub thrust_factor: f32,
     pub turn_factor: f32,
@@ -49,7 +53,7 @@ impl Default for ShipConfig {
     }
 }
 
-#[derive(Component, Default, Debug)]
+#[derive(Reflect, Component, Default, Debug)]
 pub struct ShipState {
     /// angle in radians
     pub velocity: Vec2,

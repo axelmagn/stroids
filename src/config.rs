@@ -4,7 +4,7 @@ use bevy::{
     asset::{AssetLoader, LoadContext, LoadedAsset},
     prelude::{info, AddAsset, Commands, DetectChanges, Plugin, Res, Resource},
     reflect::TypeUuid,
-    utils::{BoxedFuture, HashMap},
+    utils::BoxedFuture,
 };
 use serde::Deserialize;
 

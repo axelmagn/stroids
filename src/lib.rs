@@ -4,6 +4,7 @@ mod app;
 mod config;
 mod input;
 mod loading;
+mod meteor;
 mod player;
 mod ship;
 mod viewport;

@@ -105,7 +105,7 @@ fn system_preload_watch_config(
             commands.insert_resource(config.clone());
             commands.remove_resource::<LoadingConfig>();
             next_state.set(AppState::Loading);
-            info!("Config Loaded");
+            info!("Config loaded");
         }
         _ => {
             // not loaded yet
@@ -182,7 +182,7 @@ fn system_loading_update(
 
     if loaded == loading.0.len() {
         // TODO: go to main menu when it's implemented
-        info!("All Assets Loaded.");
+        info!("All assets loaded");
         next_state.set(AppState::InGame)
     }
 }

@@ -4,13 +4,15 @@ use bevy::{
     math::Vec3Swizzles,
     prelude::{
         info, Camera2dBundle, ClearColor, Color, Commands, Component, DetectChanges, Entity,
-        IntoSystemAppConfig, OrthographicProjection, Plugin, Query, Rect, Res, ResMut, Resource,
-        Transform, Vec2, With,
+        IntoSystemAppConfig, IntoSystemConfig, OnUpdate, OrthographicProjection, Plugin, Query,
+        Rect, Res, ResMut, Resource, Transform, Vec2, With,
     },
     reflect::Reflect,
     window::{Window, WindowResolution},
 };
 use serde::Deserialize;
+
+use crate::app::AppState;
 
 pub struct ViewportPlugin;
 
@@ -19,6 +21,7 @@ impl Plugin for ViewportPlugin {
         app.register_type::<ViewportBounds>();
         app.add_system(PrimaryCameraMarker::system_spawn.on_startup());
         app.add_system(ViewportConfig::system_handle_changed);
+        app.add_system(system_update_viewport_bounded.in_set(OnUpdate(AppState::InGame)));
     }
 }
 
@@ -92,13 +95,23 @@ impl PrimaryCameraMarker {
 }
 
 fn system_update_viewport_bounded(
-    mut commands: Commands,
     bounds: Res<ViewportBounds>,
     mut q: Query<&mut Transform, With<ViewportBounded>>,
 ) {
+    let bounds_size = bounds.0.size();
     for mut xform in q.iter_mut() {
-        if !bounds.0.contains(xform.translation.xy()) {
-            todo!()
+        let mut bounds_pos = xform.translation.xy() - bounds.0.min;
+
+        while bounds_pos.x < 0. {
+            bounds_pos.x += bounds_size.x;
         }
+        bounds_pos.x %= bounds_size.x;
+        while bounds_pos.y < 0. {
+            bounds_pos.y += bounds_size.y;
+        }
+        bounds_pos.y %= bounds_size.y;
+        let pos = bounds_pos + bounds.0.min;
+        xform.translation.x = pos.x;
+        xform.translation.y = pos.y;
     }
 }

@@ -13,6 +13,7 @@ use crate::{
     input::{InputAction, InputEvent},
     loading::AssetMap,
     ship::{ShipBundle, ShipConfig, ShipControls},
+    viewport::ViewportBounded,
 };
 
 pub struct PlayerPlugin;
@@ -42,6 +43,7 @@ pub struct PlayerConfig {
 pub struct PlayerBundle {
     marker: PlayerMarker,
     input_memory: PlayerInputMemory,
+    viewport_bounded: ViewportBounded,
 
     #[bundle]
     ship: ShipBundle,

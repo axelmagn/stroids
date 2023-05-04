@@ -12,6 +12,8 @@ meteor_brown_md_01 = "space_shooter/Meteors/meteorBrown_med1.png"
 meteor_brown_md_02 = "space_shooter/Meteors/meteorBrown_med3.png"
 meteor_brown_sm_01 = "space_shooter/Meteors/meteorBrown_small1.png"
 meteor_brown_sm_02 = "space_shooter/Meteors/meteorBrown_small2.png"
+meteor_brown_tn_01 = "space_shooter/Meteors/meteorBrown_tiny1.png"
+meteor_brown_tn_02 = "space_shooter/Meteors/meteorBrown_tiny2.png"
 
 [player.ship]
 thrust_factor = 800.0
@@ -20,6 +22,26 @@ velocity_damping = 0.8
 rotation_rate_damping = 8.0
 sprite_id = "player_ship_orange"
 
+[meteor.brown.large]
+speed = 20
+sprites = [
+	"meteor_brown_lg_01",
+	"meteor_brown_lg_02",
+	"meteor_brown_lg_03",
+	"meteor_brown_lg_04",
+]
+
+[meteor.brown.medium]
+speed = 30
+sprites = ["meteor_brown_md_01", "meteor_brown_md_02"]
+
+[meteor.brown.small]
+speed = 40
+sprites = ["meteor_brown_sm_01", "meteor_brown_sm_02"]
+
+[meteor.brown.tiny]
+speed = 40
+sprites = ["meteor_brown_tn_01", "meteor_brown_tn_02"]
 
 [viewport]
 title = "Stroids"

@@ -8,7 +8,9 @@ use bevy::{
 };
 use serde::Deserialize;
 
-use crate::{loading::AssetsConfig, player::PlayerConfig, viewport::ViewportConfig};
+use crate::{
+    loading::AssetsConfig, meteor::MeteorsConfig, player::PlayerConfig, viewport::ViewportConfig,
+};
 
 pub struct ConfigPlugin;
 
@@ -26,6 +28,7 @@ pub struct Config {
     pub assets: AssetsConfig,
     pub player: PlayerConfig,
     pub viewport: ViewportConfig,
+    pub meteor: MeteorsConfig,
 }
 
 impl Config {
@@ -44,6 +47,7 @@ impl Config {
         commands.insert_resource(config.assets.clone());
         commands.insert_resource(config.viewport.clone());
         commands.insert_resource(config.player.clone());
+        commands.insert_resource(config.meteor.clone());
     }
 }
 

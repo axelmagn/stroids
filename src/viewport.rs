@@ -3,7 +3,7 @@
 use bevy::{
     math::Vec3Swizzles,
     prelude::{
-        info, Camera2dBundle, ClearColor, Color, Commands, Component, DetectChanges, Entity,
+        info, Camera2dBundle, ClearColor, Color, Commands, Component, DetectChanges,
         IntoSystemAppConfig, IntoSystemConfig, OnUpdate, OrthographicProjection, Plugin, Query,
         Rect, Res, ResMut, Resource, Transform, Vec2, With,
     },
@@ -36,7 +36,7 @@ pub struct ViewportConfig {
 }
 
 #[derive(Resource, Clone, Reflect, Debug)]
-pub struct ViewportBounds(Rect);
+pub struct ViewportBounds(pub Rect);
 
 /// Component indicating that a component is bounded to the viewport, and will repeat itself.
 #[derive(Component, Clone, Debug, Reflect, Default)]

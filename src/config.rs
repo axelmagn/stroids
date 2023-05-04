@@ -28,7 +28,7 @@ pub struct Config {
     pub assets: AssetsConfig,
     pub player: PlayerConfig,
     pub viewport: ViewportConfig,
-    pub meteor: MeteorsConfig,
+    pub meteors: MeteorsConfig,
 }
 
 impl Config {
@@ -47,7 +47,7 @@ impl Config {
         commands.insert_resource(config.assets.clone());
         commands.insert_resource(config.viewport.clone());
         commands.insert_resource(config.player.clone());
-        commands.insert_resource(config.meteor.clone());
+        commands.insert_resource(config.meteors.clone());
     }
 }
 

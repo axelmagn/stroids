@@ -5,8 +5,8 @@ use bevy::{
 use bevy_inspector_egui::quick::WorldInspectorPlugin;
 
 use crate::{
-    config::ConfigPlugin, input::InputPlugin, loading::LoadingPlugin, player::PlayerPlugin,
-    ship::ShipPlugin, viewport::ViewportPlugin,
+    config::ConfigPlugin, input::InputPlugin, loading::LoadingPlugin, meteor::MeteorPlugin,
+    player::PlayerPlugin, ship::ShipPlugin, viewport::ViewportPlugin,
 };
 
 /// Application State.  during development, not all of these will be implemented yet.
@@ -40,6 +40,7 @@ pub fn run() {
         .add_plugin(ShipPlugin)
         .add_plugin(LoadingPlugin)
         .add_plugin(ViewportPlugin)
+        .add_plugin(MeteorPlugin)
         .insert_resource(ClearColor(Color::BLACK))
         .run();
 }

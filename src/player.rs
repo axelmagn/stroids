@@ -62,7 +62,7 @@ pub fn system_spawn(
     let sprite_id = &config.ship.sprite_id;
     let err_msg = format!("Could not find player sprite: {}", sprite_id);
     let sprite_tex = loaded_images.0.get(sprite_id).expect(&err_msg).clone();
-    let mut player = PlayerBundle {
+    let player = PlayerBundle {
         marker: PlayerMarker,
         input_memory: PlayerInputMemory::default(),
         viewport_bounded: ViewportBounded,

@@ -34,9 +34,11 @@ sprite_id = "player_ship_orange"
 collision_radius = 75
 shoot_cooldown = 0.5
 
+[meteors.variants.brown]
+
 [meteors.variants.brown.Large]
 scale = 2.5
-speed = 30
+speed = 32
 sprites = [
 	"meteor_brown_lg_01",
 	"meteor_brown_lg_02",
@@ -45,51 +47,53 @@ sprites = [
 ]
 collision_radius = 32
 
-[meteor.brown.Medium]
-scale = 2.5
-speed = 35
+[meteors.variants.brown.Medium]
+scale = 3
+speed = 48
 sprites = ["meteor_brown_md_01", "meteor_brown_md_02"]
+collision_radius = 24
+
+[meteors.variants.brown.Small]
+scale = 4
+speed = 64
+sprites = ["meteor_brown_sm_01", "meteor_brown_sm_02"]
 collision_radius = 16
 
-[meteor.brown.Small]
-scale = 2.5
-speed = 40
-sprites = ["meteor_brown_sm_01", "meteor_brown_sm_02"]
-collision_radius = 8
-
-[meteor.brown.Tiny]
-scale = 2.5
-speed = 40
+[meteors.variants.brown.Tiny]
+scale = 4
+speed = 64
 sprites = ["meteor_brown_tn_01", "meteor_brown_tn_02"]
 collision_radius = 4
 
+[meteors.variants.grey]
+
 [meteors.variants.grey.Large]
-scale = 2.5
-speed = 30
+scale = 3
+speed = 32
 sprites = [
 	"meteor_grey_lg_01",
 	"meteor_grey_lg_02",
 	"meteor_grey_lg_03",
 	"meteor_grey_lg_04",
 ]
-collision_radius = 32
+collision_radius = 48
 
-[meteor.grey.Medium]
-scale = 2.5
-speed = 35
-sprites = ["meteor_grey_md_01", "meteor_brown_md_02"]
+[meteors.variants.grey.Medium]
+scale = 3
+speed = 48
+sprites = ["meteor_grey_md_01", "meteor_grey_md_02"]
+collision_radius = 24
+
+[meteors.variants.grey.Small]
+scale = 4
+speed = 64
+sprites = ["meteor_grey_sm_01", "meteor_grey_sm_02"]
 collision_radius = 16
 
-[meteor.grey.Small]
-scale = 2.5
-speed = 40
-sprites = ["meteor_grey_sm_01", "meteor_brown_sm_02"]
-collision_radius = 8
-
-[meteor.grey.Tiny]
-scale = 2.5
-speed = 40
-sprites = ["meteor_grey_tn_01", "meteor_brown_tn_02"]
+[meteors.variants.grey.Tiny]
+scale = 4
+speed = 64
+sprites = ["meteor_grey_tn_01", "meteor_grey_tn_02"]
 collision_radius = 4
 
 [projectile]

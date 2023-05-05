@@ -2,6 +2,7 @@ use bevy::{
     prelude::{App, ClearColor, Color, States},
     DefaultPlugins,
 };
+use bevy_mod_gizmos::GizmosPlugin;
 
 use crate::{
     collision::CollisionPlugin,
@@ -40,6 +41,7 @@ pub fn run() {
     App::new()
         .add_state::<AppState>()
         .add_plugins(DefaultPlugins)
+        .add_plugin(GizmosPlugin)
         // .add_plugin(WorldInspectorPlugin::new())
         .add_plugin(CollisionPlugin)
         .add_plugin(ConfigPlugin)

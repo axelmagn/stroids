@@ -6,7 +6,6 @@ use bevy::{
         OnUpdate, Plugin, Query, Res, Resource, Transform, Vec2, Vec3, With,
     },
     sprite::SpriteBundle,
-    time::Time,
     utils::{default, HashMap},
 };
 use rand::{distributions::Uniform, thread_rng, Rng};
@@ -18,6 +17,7 @@ use crate::{
     kinematics::{AngularVelocity, KinematicsBundle, Velocity},
     loading::AssetMap,
     player::PlayerMarker,
+    projectile::ProjectileComponent,
     viewport::{ViewportBounded, ViewportBounds},
 };
 
@@ -29,6 +29,9 @@ impl Plugin for MeteorPlugin {
         app.add_system(MeteorBundle::system_spawn.in_schedule(OnEnter(AppState::InGame)));
         app.add_system(
             MeteorBundle::system_handle_player_collision.in_set(OnUpdate(AppState::InGame)),
+        );
+        app.add_system(
+            MeteorBundle::system_handle_projectile_collision.in_set(OnUpdate(AppState::InGame)),
         );
     }
 }
@@ -114,11 +117,14 @@ impl MeteorBundle {
         location: Vec3,
         config: &MeteorsConfig,
         images: &AssetMap<Image>,
+        variant: Option<&String>,
     ) -> Self {
         // roll random meteor variant
-        let variant_dist = Uniform::new(0, config.variants.len());
-        let variant_idx = rng.sample(variant_dist);
-        let variant_key = config.variants.keys().take(variant_idx + 1).last().unwrap();
+        let variant_key = variant.unwrap_or_else(|| {
+            let variant_dist = Uniform::new(0, config.variants.len());
+            let variant_idx = rng.sample(variant_dist);
+            config.variants.keys().take(variant_idx + 1).last().unwrap()
+        });
         let meteor_config = &config.variants[variant_key].0[&size];
 
         // roll random sprite from variant
@@ -141,7 +147,7 @@ impl MeteorBundle {
         Self {
             behavior: MeteorBehavior {
                 size,
-                variant: variant_key.clone(),
+                variant: String::from(variant_key),
             },
             sprite_bundle: SpriteBundle {
                 texture: sprite_handle,
@@ -188,7 +194,14 @@ impl MeteorBundle {
                 }
 
                 // roll meteor
-                Self::new_random(&mut rng, MeteorSize::Large, pos, &meteors_config, &images)
+                Self::new_random(
+                    &mut rng,
+                    MeteorSize::Large,
+                    pos,
+                    &meteors_config,
+                    &images,
+                    None,
+                )
             })
             .collect();
         commands.spawn_batch(bundles);
@@ -207,6 +220,45 @@ impl MeteorBundle {
                 ) {
                     // TODO: emit & handle player death event
                     commands.entity(player_entity).despawn();
+                }
+            }
+        }
+    }
+
+    fn system_handle_projectile_collision(
+        mut commands: Commands,
+        q_meteors: Query<(Entity, &Transform, &Collider, &MeteorBehavior)>,
+        q_projectile: Query<(Entity, &Transform, &Collider), With<ProjectileComponent>>,
+        meteors_config: Res<MeteorsConfig>,
+        images: Res<AssetMap<Image>>,
+    ) {
+        for (projectile_entity, projectile_xform, projectile_collider) in q_projectile.iter() {
+            for (meteor_entity, meteor_xform, meteor_collider, meteor_behavior) in q_meteors.iter()
+            {
+                if Collider::is_collision(
+                    (projectile_xform, projectile_collider),
+                    (meteor_xform, meteor_collider),
+                ) {
+                    commands.entity(projectile_entity).despawn();
+                    commands.entity(meteor_entity).despawn();
+                    // split meteor if possible
+                    if meteor_behavior.size.can_split() {
+                        let mut rng = thread_rng();
+                        // TODO: configure split
+                        let children: Vec<MeteorBundle> = (0..2)
+                            .map(|_i| {
+                                MeteorBundle::new_random(
+                                    &mut rng,
+                                    meteor_behavior.size.smaller().unwrap(),
+                                    meteor_xform.translation,
+                                    &meteors_config,
+                                    &images,
+                                    Some(&meteor_behavior.variant),
+                                )
+                            })
+                            .collect();
+                        commands.spawn_batch(children);
+                    }
                 }
             }
         }

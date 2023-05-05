@@ -10,6 +10,7 @@ use bevy::{
     reflect::Reflect,
     window::{Window, WindowResolution},
 };
+use bevy_mod_gizmos::GizmoInteractionCamera;
 use serde::Deserialize;
 
 use crate::app::AppState;
@@ -92,7 +93,11 @@ pub struct PrimaryCameraMarker;
 
 impl PrimaryCameraMarker {
     fn system_spawn(mut commands: Commands) {
-        commands.spawn((PrimaryCameraMarker, Camera2dBundle::default()));
+        commands.spawn((
+            PrimaryCameraMarker,
+            GizmoInteractionCamera,
+            Camera2dBundle::default(),
+        ));
     }
 }
 

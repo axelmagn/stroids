@@ -1,15 +1,18 @@
 use bevy::{
     math::Vec3Swizzles,
     prelude::{
-        Bundle, Component, IntoSystemConfig, OnUpdate, Plugin, Query, Res, Transform, Vec2, Vec3,
+        Bundle, Component, IntoSystemConfig, OnUpdate, Plugin, Query, Transform, Vec2, Vec3,
     },
     reflect::Reflect,
     sprite::SpriteBundle,
-    time::Time,
 };
 use serde::Deserialize;
 
-use crate::app::AppState;
+use crate::{
+    app::AppState,
+    collision::Collider,
+    kinematics::{Acceleration, AngularAcceleration, KinematicsBundle},
+};
 
 pub struct ShipPlugin;
 
@@ -17,9 +20,25 @@ impl Plugin for ShipPlugin {
     fn build(&self, app: &mut bevy::prelude::App) {
         app.register_type::<ShipControls>();
         app.register_type::<ShipConfig>();
-        app.register_type::<ShipState>();
-        app.add_system(apply_ship_controls_system.in_set(OnUpdate(AppState::InGame)));
-        app.add_system(update_ship_physics_system.in_set(OnUpdate(AppState::InGame)));
+        app.add_system(Self::system_ship_controls.in_set(OnUpdate(AppState::InGame)));
+    }
+}
+
+impl ShipPlugin {
+    fn system_ship_controls(
+        mut q: Query<(
+            &ShipControls,
+            &ShipConfig,
+            &Transform,
+            &mut Acceleration,
+            &mut AngularAcceleration,
+        )>,
+    ) {
+        q.iter_mut()
+            .for_each(|(controls, config, xform, mut acc, mut racc)| {
+                acc.0 = xform.up().xy() * controls.thrust * config.thrust_factor;
+                racc.0 = controls.turn * config.turn_factor;
+            });
     }
 }
 
@@ -31,81 +50,25 @@ pub struct ShipControls {
     pub turn: f32,
 }
 
-#[derive(Reflect, Component, Clone, Debug, Deserialize)]
+#[derive(Reflect, Component, Clone, Debug, Default, Deserialize)]
 pub struct ShipConfig {
     pub thrust_factor: f32,
     pub turn_factor: f32,
     pub velocity_damping: f32,
     pub rotation_rate_damping: f32,
     pub sprite_id: String,
-}
-
-// TODO: delete
-impl Default for ShipConfig {
-    fn default() -> Self {
-        Self {
-            thrust_factor: 400.0,
-            turn_factor: 7.0,
-            velocity_damping: 0.3,
-            rotation_rate_damping: 0.7,
-            sprite_id: "".to_string(),
-        }
-    }
-}
-
-#[derive(Reflect, Component, Default, Debug)]
-pub struct ShipState {
-    /// angle in radians
-    pub velocity: Vec2,
-    pub rotation_rate: f32,
+    pub collision_radius: f32,
 }
 
 #[derive(Bundle, Default)]
 pub struct ShipBundle {
     pub controls: ShipControls,
     pub config: ShipConfig,
-    pub state: ShipState,
+    pub collider: Collider,
 
     #[bundle]
     pub sprite: SpriteBundle,
-}
 
-/// Apply ship controls to ship state
-pub fn apply_ship_controls_system(
-    time: Res<Time>,
-    mut q: Query<(&ShipControls, &ShipConfig, &mut ShipState, &Transform)>,
-) {
-    for (controls, config, mut state, transform) in q.iter_mut() {
-        let dt = time.delta_seconds();
-
-        // apply rotation
-        state.rotation_rate += controls.turn * config.turn_factor * dt;
-
-        // apply thrust
-        let accel_dir = transform.up().xy();
-        let accel_mag = controls.thrust * config.thrust_factor * dt;
-        let accel = accel_dir * accel_mag;
-        state.velocity += accel;
-    }
-}
-
-pub fn update_ship_physics_system(
-    time: Res<Time>,
-    mut q: Query<(&ShipConfig, &mut ShipState, &mut Transform)>,
-) {
-    for (config, mut state, mut transform) in q.iter_mut() {
-        let dt = time.delta_seconds();
-
-        // apply rotation damping
-        state.rotation_rate *= 1. - config.rotation_rate_damping * dt;
-
-        // apply velocity damping
-        state.velocity *= 1. - config.velocity_damping * dt;
-
-        // apply velocity to position
-        transform.translation += Vec3::from((state.velocity * dt, 0.));
-
-        // apply rotation rate to rotation
-        transform.rotate_z(state.rotation_rate * dt);
-    }
+    #[bundle]
+    pub kinematics: KinematicsBundle,
 }

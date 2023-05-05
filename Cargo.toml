@@ -24,6 +24,7 @@ lto = "thin"
 [dependencies]
 bevy = { version = "0.10.1", features = ["subpixel_glyph_atlas"] }
 bevy-inspector-egui = "0.18.3"
+bevy_mod_gizmos = "0.4.0"
 clap = { version = "4.2.5", features = ["derive"] }
 rand = "0.8.5"
 serde = "1.0.160"

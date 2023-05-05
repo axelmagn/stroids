@@ -1,47 +1,45 @@
 //! Really simple collision: everything is a circle under the hood.
 
-use bevy::prelude::{
-    Component, Entity, EventWriter, IntoSystemConfig, OnUpdate, Plugin, Query, Transform,
+use bevy::{
+    prelude::{Color, Component, Plugin, Query, Transform},
+    reflect::Reflect,
 };
-
-use crate::app::AppState;
+use bevy_mod_gizmos::{draw_gizmo, Gizmo};
+use serde::Deserialize;
 
 pub struct CollisionPlugin;
 
 impl Plugin for CollisionPlugin {
     fn build(&self, app: &mut bevy::prelude::App) {
-        app.add_system(Collider::system_check_collisions.in_set(OnUpdate(AppState::InGame)));
+        app.add_system(Self::system_draw_debug);
     }
 }
 
-#[derive(Debug, Clone, Component)]
-pub struct Collider {
-    radius: f32,
+impl CollisionPlugin {
+    // TODO: toggle based on resource
+    fn system_draw_debug(q: Query<(&Collider, &Transform)>) {
+        q.for_each(|(collider, xform)| {
+            draw_gizmo(Gizmo::new(
+                xform.translation,
+                collider.radius,
+                Color::PURPLE,
+            ))
+        });
+    }
 }
 
-#[derive(Debug, Clone, Copy)]
-pub struct CollisionEvent {
-    pub a: Entity,
-    pub b: Entity,
+#[derive(Debug, Clone, Default, Component, Deserialize, Reflect)]
+pub struct Collider {
+    pub radius: f32,
 }
 
 impl Collider {
-    fn system_check_collisions(
-        q: Query<(Entity, &Collider, &Transform)>,
-        mut collision_events: EventWriter<CollisionEvent>,
-    ) {
-        let mut entities: Vec<(Entity, &Collider, &Transform)> = q.iter().collect();
-        entities.sort_by(|a, b| a.0.cmp(&b.0));
-        for i in 0..entities.len() {
-            for j in (i + 1)..entities.len() {
-                let (e1, c1, t1) = entities[i];
-                let (e2, c2, t2) = entities[j];
-                let dist = t1.translation.distance(t2.translation);
-                let is_collision = dist <= c1.radius + c2.radius;
-                if is_collision {
-                    collision_events.send(CollisionEvent { a: e1, b: e2 })
-                }
-            }
-        }
+    pub fn is_collision(
+        entity1: (&Transform, &Collider),
+        entity2: (&Transform, &Collider),
+    ) -> bool {
+        let dist = entity1.0.translation.distance(entity2.0.translation);
+        let min_dist = entity1.1.radius + entity2.1.radius;
+        dist <= min_dist
     }
 }

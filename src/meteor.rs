@@ -2,8 +2,8 @@ use std::f32::consts::PI;
 
 use bevy::{
     prelude::{
-        Bundle, Commands, Component, Image, IntoSystemAppConfig, IntoSystemConfig, OnEnter,
-        OnUpdate, Plugin, Query, Res, Resource, Transform, Vec2, Vec3,
+        Bundle, Commands, Component, Entity, Image, IntoSystemAppConfig, IntoSystemConfig, OnEnter,
+        OnUpdate, Plugin, Query, Res, Resource, Transform, Vec2, Vec3, With,
     },
     sprite::SpriteBundle,
     time::Time,
@@ -14,7 +14,10 @@ use serde::Deserialize;
 
 use crate::{
     app::AppState,
+    collision::Collider,
+    kinematics::{AngularVelocity, KinematicsBundle, Velocity},
     loading::AssetMap,
+    player::PlayerMarker,
     viewport::{ViewportBounded, ViewportBounds},
 };
 
@@ -24,7 +27,9 @@ pub struct MeteorPlugin;
 impl Plugin for MeteorPlugin {
     fn build(&self, app: &mut bevy::prelude::App) {
         app.add_system(MeteorBundle::system_spawn.in_schedule(OnEnter(AppState::InGame)));
-        app.add_system(MeteorBundle::system_movement.in_set(OnUpdate(AppState::InGame)));
+        app.add_system(
+            MeteorBundle::system_handle_player_collision.in_set(OnUpdate(AppState::InGame)),
+        );
     }
 }
 
@@ -40,10 +45,17 @@ enum MeteorSize {
 impl MeteorSize {
     fn smaller(&self) -> Option<MeteorSize> {
         match self {
-            MeteorSize::Large => Some(MeteorSize::Medium),
-            MeteorSize::Medium => Some(MeteorSize::Small),
-            MeteorSize::Small => Some(MeteorSize::Tiny),
-            MeteorSize::Tiny => None,
+            Self::Large => Some(Self::Medium),
+            Self::Medium => Some(Self::Small),
+            Self::Small => Some(Self::Tiny),
+            Self::Tiny => None,
+        }
+    }
+
+    fn can_split(&self) -> bool {
+        match self {
+            Self::Medium | Self::Large => true,
+            _ => false,
         }
     }
 }
@@ -64,6 +76,7 @@ struct SizedMeteorConfig {
     sprites: Vec<String>,
     speed: f32,
     scale: f32,
+    collision_radius: f32,
 }
 
 impl Default for SizedMeteorConfig {
@@ -72,24 +85,26 @@ impl Default for SizedMeteorConfig {
             sprites: Default::default(),
             speed: Default::default(),
             scale: 1.,
+            collision_radius: 100.,
         }
     }
 }
 
 #[derive(Debug, Default, Component)]
 struct MeteorBehavior {
-    rotation_velocity: f32,
     size: MeteorSize,
     variant: String,
-    velocity: Vec2,
 }
 
 #[derive(Bundle, Default)]
 struct MeteorBundle {
     behavior: MeteorBehavior,
     viewport_bounded: ViewportBounded,
+    collider: Collider,
     #[bundle]
     sprite_bundle: SpriteBundle,
+    #[bundle]
+    kinematics: KinematicsBundle,
 }
 
 impl MeteorBundle {
@@ -115,18 +130,18 @@ impl MeteorBundle {
         // roll random direction
         let angle_dist = Uniform::new(0., PI * 2.);
         let angle = rng.sample(angle_dist);
-        let velocity = Vec2::from_angle(angle) * meteor_config.speed;
+        let velocity = Velocity(Vec2::from_angle(angle) * meteor_config.speed);
 
         // roll random rotation_velocity
-        let rotation_velocity_max = PI / 4.;
-        let rotation_velocity_dist = Uniform::new(-rotation_velocity_max, rotation_velocity_max);
-        let rotation_velocity = rng.sample(rotation_velocity_dist);
+        let angular_velocity_max = PI / 4.;
+        let angular_velocity_dist = Uniform::new(-angular_velocity_max, angular_velocity_max);
+        let angular_velocity = AngularVelocity(rng.sample(angular_velocity_dist));
+
+        // create bundle
         Self {
             behavior: MeteorBehavior {
-                rotation_velocity,
                 size,
                 variant: variant_key.clone(),
-                velocity,
             },
             sprite_bundle: SpriteBundle {
                 texture: sprite_handle,
@@ -137,15 +152,15 @@ impl MeteorBundle {
                 },
                 ..default()
             },
+            collider: Collider {
+                radius: meteor_config.collision_radius * meteor_config.scale,
+            },
+            kinematics: KinematicsBundle {
+                velocity,
+                angular_velocity,
+                ..default()
+            },
             ..default()
-        }
-    }
-
-    fn system_movement(mut q: Query<(&MeteorBehavior, &mut Transform)>, time: Res<Time>) {
-        let dt = time.delta_seconds();
-        for (behavior, mut xform) in q.iter_mut() {
-            xform.translation += Vec3::from((behavior.velocity * dt, 0.));
-            xform.rotate_z(behavior.rotation_velocity * dt);
         }
     }
 
@@ -158,20 +173,42 @@ impl MeteorBundle {
         let mut rng = thread_rng();
 
         // TODO: level progression
-        let bundles: Vec<MeteorBundle> = (0..10)
+        let bundles: Vec<MeteorBundle> = (0..4)
             .into_iter()
             .map(|_| {
-                // roll position
-                let x_dist = Uniform::new(viewport_bounds.0.min.x, viewport_bounds.0.max.x);
-                let y_dist = Uniform::new(viewport_bounds.0.min.y, viewport_bounds.0.max.y);
-                let x = rng.sample(x_dist);
-                let y = rng.sample(y_dist);
-                let pos = Vec3::new(x, y, 0.);
+                // roll position - make sure it's not too close to the center where the player is
+                // TODO: make configurable
+                let mut pos = Vec3::ZERO;
+                while pos.distance(Vec3::ZERO) < 300. {
+                    let x_dist = Uniform::new(viewport_bounds.0.min.x, viewport_bounds.0.max.x);
+                    let y_dist = Uniform::new(viewport_bounds.0.min.y, viewport_bounds.0.max.y);
+                    let x = rng.sample(x_dist);
+                    let y = rng.sample(y_dist);
+                    pos = Vec3::new(x, y, 0.);
+                }
 
                 // roll meteor
                 Self::new_random(&mut rng, MeteorSize::Large, pos, &meteors_config, &images)
             })
             .collect();
         commands.spawn_batch(bundles);
+    }
+
+    fn system_handle_player_collision(
+        mut commands: Commands,
+        q_meteors: Query<(&Transform, &Collider), With<MeteorBehavior>>,
+        q_player: Query<(Entity, &Transform, &Collider), With<PlayerMarker>>,
+    ) {
+        for (player_entity, player_xform, player_collider) in q_player.iter() {
+            for (meteor_xform, meteor_collider) in q_meteors.iter() {
+                if Collider::is_collision(
+                    (player_xform, player_collider),
+                    (meteor_xform, meteor_collider),
+                ) {
+                    // TODO: emit & handle player death event
+                    commands.entity(player_entity).despawn();
+                }
+            }
+        }
     }
 }

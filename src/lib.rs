@@ -4,6 +4,7 @@ mod app;
 mod collision;
 mod config;
 mod input;
+mod kinematics;
 mod loading;
 mod meteor;
 mod player;

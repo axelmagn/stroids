@@ -21,6 +21,7 @@ turn_factor = 40.0
 velocity_damping = 0.8
 rotation_rate_damping = 8.0
 sprite_id = "player_ship_orange"
+collision_radius = 75
 
 [meteors.variants.brown.Large]
 scale = 2.5
@@ -31,20 +32,25 @@ sprites = [
 	"meteor_brown_lg_03",
 	"meteor_brown_lg_04",
 ]
+collision_radius = 32
+
 [meteor.brown.Medium]
 scale = 2.5
 speed = 35
 sprites = ["meteor_brown_md_01", "meteor_brown_md_02"]
+collision_radius = 16
 
 [meteor.brown.Small]
 scale = 2.5
 speed = 40
 sprites = ["meteor_brown_sm_01", "meteor_brown_sm_02"]
+collision_radius = 8
 
 [meteor.brown.Tiny]
 scale = 2.5
 speed = 40
 sprites = ["meteor_brown_tn_01", "meteor_brown_tn_02"]
+collision_radius = 4
 
 [viewport]
 title = "Stroids"

@@ -4,13 +4,16 @@ use bevy::{
         App, Bundle, Commands, Component, EventReader, Image, IntoSystemAppConfig,
         IntoSystemConfig, OnEnter, OnUpdate, Plugin, Query, Res, Resource, With,
     },
+    sprite::SpriteBundle,
     utils::default,
 };
 use serde::Deserialize;
 
 use crate::{
     app::AppState,
+    collision::Collider,
     input::{InputAction, InputEvent},
+    kinematics::{AngularDamping, KinematicsBundle, LinearDamping},
     loading::AssetMap,
     ship::{ShipBundle, ShipConfig, ShipControls},
     viewport::ViewportBounded,
@@ -55,16 +58,28 @@ pub fn spawn_player_system(
     config: Res<PlayerConfig>,
 ) {
     // TODO: get ShipBundle from ShipConfig
-    let mut player = PlayerBundle {
+    let sprite_id = &config.ship.sprite_id;
+    let err_msg = format!("Could not find player sprite: {}", sprite_id);
+    let sprite_tex = loaded_images.0.get(sprite_id).expect(&err_msg).clone();
+    let player = PlayerBundle {
         ship: ShipBundle {
             config: config.ship.clone(),
+            collider: Collider {
+                radius: config.ship.collision_radius,
+            },
+            kinematics: KinematicsBundle {
+                linear_damping: LinearDamping(config.ship.velocity_damping),
+                angular_damping: AngularDamping(config.ship.rotation_rate_damping),
+                ..default()
+            },
+            sprite: SpriteBundle {
+                texture: sprite_tex,
+                ..default()
+            },
             ..default()
         },
         ..default()
     };
-    let sprite_id = &config.ship.sprite_id;
-    let err_msg = format!("Could not find player sprite: {}", sprite_id);
-    player.ship.sprite.texture = loaded_images.0.get(sprite_id).expect(&err_msg).clone();
     commands.spawn(player);
 }
 
@@ -72,10 +87,9 @@ pub fn handle_player_input_system(
     mut q: Query<(&mut ShipControls, &mut PlayerInputMemory), (With<PlayerMarker>,)>,
     mut evr_inputs: EventReader<InputEvent>,
 ) {
-    let (mut controls, mut input_mem) = q.single_mut();
-    evr_inputs
-        .iter()
-        .for_each(|ev_input| match ev_input.action {
+    let inputs: Vec<InputEvent> = evr_inputs.iter().map(|e| e.clone()).collect();
+    for (mut controls, mut input_mem) in q.iter_mut() {
+        inputs.iter().for_each(|ev_input| match ev_input.action {
             InputAction::Thrust(x) => {
                 match (ev_input.state, input_mem.thrust) {
                     (ButtonState::Pressed, _) => {
@@ -106,4 +120,5 @@ pub fn handle_player_input_system(
                 _ => {}
             },
         });
+    }
 }

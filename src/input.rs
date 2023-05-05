@@ -21,6 +21,7 @@ impl Plugin for InputPlugin {
 pub enum InputAction {
     Thrust(f32),
     Turn(f32),
+    Shoot,
 }
 
 #[derive(Clone, Copy, Debug)]
@@ -40,10 +41,11 @@ pub fn keyboard_input_system(
         ev.key_code
             // convert key code to input action
             .map(|code| match code {
-                KeyCode::W => Some(InputAction::Thrust(1.)),
-                KeyCode::S => Some(InputAction::Thrust(-1.)),
-                KeyCode::A => Some(InputAction::Turn(1.)),
-                KeyCode::D => Some(InputAction::Turn(-1.)),
+                KeyCode::W | KeyCode::Up => Some(InputAction::Thrust(1.)),
+                KeyCode::S | KeyCode::Down => Some(InputAction::Thrust(-1.)),
+                KeyCode::A | KeyCode::Left => Some(InputAction::Turn(1.)),
+                KeyCode::D | KeyCode::Right => Some(InputAction::Turn(-1.)),
+                KeyCode::Space => Some(InputAction::Shoot),
                 _ => None,
             })
             .flatten()

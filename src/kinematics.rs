@@ -46,7 +46,7 @@ impl KinematicsPlugin {
     fn system_linear_damping(mut q: Query<(&mut Velocity, &LinearDamping)>, time: Res<Time>) {
         let dt = time.delta_seconds();
         q.iter_mut()
-            .for_each(|(mut vel, ldamp)| vel.0 *= (1. - ldamp.0 * dt));
+            .for_each(|(mut vel, ldamp)| vel.0 *= 1. - ldamp.0 * dt);
     }
 
     fn system_angular_damping(
@@ -55,7 +55,7 @@ impl KinematicsPlugin {
     ) {
         let dt = time.delta_seconds();
         q.iter_mut()
-            .for_each(|(mut rvel, rdamp)| rvel.0 *= (1. - rdamp.0 * dt));
+            .for_each(|(mut rvel, rdamp)| rvel.0 *= 1. - rdamp.0 * dt);
     }
 }
 

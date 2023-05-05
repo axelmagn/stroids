@@ -8,6 +8,7 @@ mod kinematics;
 mod loading;
 mod meteor;
 mod player;
+mod projectile;
 mod ship;
 mod viewport;
 

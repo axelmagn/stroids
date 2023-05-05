@@ -2,12 +2,18 @@ use bevy::{
     prelude::{App, ClearColor, Color, States},
     DefaultPlugins,
 };
-use bevy_inspector_egui::quick::WorldInspectorPlugin;
 
 use crate::{
-    collision::CollisionPlugin, config::ConfigPlugin, input::InputPlugin,
-    kinematics::KinematicsPlugin, loading::LoadingPlugin, meteor::MeteorPlugin,
-    player::PlayerPlugin, ship::ShipPlugin, viewport::ViewportPlugin,
+    collision::CollisionPlugin,
+    config::ConfigPlugin,
+    input::InputPlugin,
+    kinematics::KinematicsPlugin,
+    loading::LoadingPlugin,
+    meteor::MeteorPlugin,
+    player::PlayerPlugin,
+    projectile::{ProjectileBundle, ProjectilePlugin},
+    ship::ShipPlugin,
+    viewport::ViewportPlugin,
 };
 
 /// Application State.  during development, not all of these will be implemented yet.
@@ -42,6 +48,7 @@ pub fn run() {
         .add_plugin(LoadingPlugin)
         .add_plugin(MeteorPlugin)
         .add_plugin(PlayerPlugin)
+        .add_plugin(ProjectilePlugin)
         .add_plugin(ShipPlugin)
         .add_plugin(ViewportPlugin)
         .insert_resource(ClearColor(Color::BLACK))

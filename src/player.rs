@@ -5,6 +5,7 @@ use bevy::{
         IntoSystemConfig, OnEnter, OnUpdate, Plugin, Query, Res, Resource, With,
     },
     sprite::SpriteBundle,
+    time::{Timer, TimerMode},
     utils::default,
 };
 use serde::Deserialize;
@@ -15,7 +16,7 @@ use crate::{
     input::{InputAction, InputEvent},
     kinematics::{AngularDamping, KinematicsBundle, LinearDamping},
     loading::AssetMap,
-    ship::{ShipBundle, ShipConfig, ShipControls},
+    ship::{ShipBundle, ShipConfig, ShipControls, ShootCooldown},
     viewport::ViewportBounded,
 };
 
@@ -23,8 +24,8 @@ pub struct PlayerPlugin;
 
 impl Plugin for PlayerPlugin {
     fn build(&self, app: &mut App) {
-        app.add_system(spawn_player_system.in_schedule(OnEnter(AppState::InGame)));
-        app.add_system(handle_player_input_system.in_set(OnUpdate(AppState::InGame)));
+        app.add_system(system_spawn.in_schedule(OnEnter(AppState::InGame)));
+        app.add_system(system_handle_input.in_set(OnUpdate(AppState::InGame)));
     }
 }
 
@@ -42,7 +43,7 @@ pub struct PlayerConfig {
     pub ship: ShipConfig,
 }
 
-#[derive(Bundle, Default)]
+#[derive(Bundle)]
 pub struct PlayerBundle {
     marker: PlayerMarker,
     input_memory: PlayerInputMemory,
@@ -52,7 +53,7 @@ pub struct PlayerBundle {
     ship: ShipBundle,
 }
 
-pub fn spawn_player_system(
+pub fn system_spawn(
     mut commands: Commands,
     loaded_images: Res<AssetMap<Image>>,
     config: Res<PlayerConfig>,
@@ -61,29 +62,35 @@ pub fn spawn_player_system(
     let sprite_id = &config.ship.sprite_id;
     let err_msg = format!("Could not find player sprite: {}", sprite_id);
     let sprite_tex = loaded_images.0.get(sprite_id).expect(&err_msg).clone();
-    let player = PlayerBundle {
+    let mut player = PlayerBundle {
+        marker: PlayerMarker,
+        input_memory: PlayerInputMemory::default(),
+        viewport_bounded: ViewportBounded,
         ship: ShipBundle {
+            controls: ShipControls::default(),
             config: config.ship.clone(),
             collider: Collider {
                 radius: config.ship.collision_radius,
+            },
+            shoot_cooldown: ShootCooldown(Timer::from_seconds(
+                config.ship.shoot_cooldown,
+                TimerMode::Once,
+            )),
+            sprite: SpriteBundle {
+                texture: sprite_tex,
+                ..default()
             },
             kinematics: KinematicsBundle {
                 linear_damping: LinearDamping(config.ship.velocity_damping),
                 angular_damping: AngularDamping(config.ship.rotation_rate_damping),
                 ..default()
             },
-            sprite: SpriteBundle {
-                texture: sprite_tex,
-                ..default()
-            },
-            ..default()
         },
-        ..default()
     };
     commands.spawn(player);
 }
 
-pub fn handle_player_input_system(
+pub fn system_handle_input(
     mut q: Query<(&mut ShipControls, &mut PlayerInputMemory), (With<PlayerMarker>,)>,
     mut evr_inputs: EventReader<InputEvent>,
 ) {
@@ -118,6 +125,10 @@ pub fn handle_player_input_system(
                     }
                 }
                 _ => {}
+            },
+            InputAction::Shoot => match ev_input.state {
+                ButtonState::Pressed => controls.shoot = true,
+                ButtonState::Released => controls.shoot = false,
             },
         });
     }

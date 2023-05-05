@@ -14,6 +14,16 @@ meteor_brown_sm_01 = "space_shooter/Meteors/meteorBrown_small1.png"
 meteor_brown_sm_02 = "space_shooter/Meteors/meteorBrown_small2.png"
 meteor_brown_tn_01 = "space_shooter/Meteors/meteorBrown_tiny1.png"
 meteor_brown_tn_02 = "space_shooter/Meteors/meteorBrown_tiny2.png"
+meteor_grey_lg_01 = "space_shooter/Meteors/meteorGrey_big1.png"
+meteor_grey_lg_02 = "space_shooter/Meteors/meteorGrey_big2.png"
+meteor_grey_lg_03 = "space_shooter/Meteors/meteorGrey_big3.png"
+meteor_grey_lg_04 = "space_shooter/Meteors/meteorGrey_big4.png"
+meteor_grey_md_01 = "space_shooter/Meteors/meteorGrey_med1.png"
+meteor_grey_md_02 = "space_shooter/Meteors/meteorGrey_med2.png"
+meteor_grey_sm_01 = "space_shooter/Meteors/meteorGrey_small1.png"
+meteor_grey_sm_02 = "space_shooter/Meteors/meteorGrey_small2.png"
+meteor_grey_tn_01 = "space_shooter/Meteors/meteorGrey_tiny1.png"
+meteor_grey_tn_02 = "space_shooter/Meteors/meteorGrey_tiny2.png"
 
 [player.ship]
 thrust_factor = 800.0
@@ -22,6 +32,7 @@ velocity_damping = 0.8
 rotation_rate_damping = 8.0
 sprite_id = "player_ship_orange"
 collision_radius = 75
+shoot_cooldown = 0.5
 
 [meteors.variants.brown.Large]
 scale = 2.5
@@ -52,6 +63,42 @@ speed = 40
 sprites = ["meteor_brown_tn_01", "meteor_brown_tn_02"]
 collision_radius = 4
 
+[meteors.variants.grey.Large]
+scale = 2.5
+speed = 30
+sprites = [
+	"meteor_grey_lg_01",
+	"meteor_grey_lg_02",
+	"meteor_grey_lg_03",
+	"meteor_grey_lg_04",
+]
+collision_radius = 32
+
+[meteor.grey.Medium]
+scale = 2.5
+speed = 35
+sprites = ["meteor_grey_md_01", "meteor_brown_md_02"]
+collision_radius = 16
+
+[meteor.grey.Small]
+scale = 2.5
+speed = 40
+sprites = ["meteor_grey_sm_01", "meteor_brown_sm_02"]
+collision_radius = 8
+
+[meteor.grey.Tiny]
+scale = 2.5
+speed = 40
+sprites = ["meteor_grey_tn_01", "meteor_brown_tn_02"]
+collision_radius = 4
+
+[projectile]
+sprite_id = "laser_red"
+speed = 1024
+collision_radius = 4
+scale = 2.5
+lifetime = 1
+
 [viewport]
 title = "Stroids"
 resolution = [800, 600]
@@ -59,5 +106,6 @@ resolution = [800, 600]
 fit_canvas_to_parent = false
 # Tells wasm not to override default event handling, like F5, Ctrl+R etc.
 prevent_default_event_handling = false
-background_color = "#111122"
+background_color = "#080811"
 camera_scale = 3.0
+bounding_margin = 100

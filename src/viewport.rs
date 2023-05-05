@@ -33,6 +33,7 @@ pub struct ViewportConfig {
     resolution: [f32; 2],
     background_color: String,
     camera_scale: f32,
+    bounding_margin: f32,
 }
 
 #[derive(Resource, Clone, Reflect, Debug)]
@@ -78,7 +79,8 @@ impl ViewportConfig {
             .iter_mut()
             .for_each(|mut p| p.scale = viewport_config.camera_scale);
 
-        let bounds_size = Vec2::from(viewport_config.resolution) * viewport_config.camera_scale;
+        let bounds_size = Vec2::from(viewport_config.resolution) * viewport_config.camera_scale
+            + viewport_config.bounding_margin;
         let viewport_bounds = ViewportBounds(Rect::from_center_size(Vec2::ZERO, bounds_size));
         info!("Viewport bounds: {:?}", viewport_bounds);
         commands.insert_resource(viewport_bounds);

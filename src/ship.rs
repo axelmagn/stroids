@@ -1,7 +1,7 @@
 use bevy::{
     math::Vec3Swizzles,
     prelude::{
-        info, Bundle, Commands, Component, Image, IntoSystemConfig, OnUpdate, Plugin, Query, Res,
+        Bundle, Commands, Component, Image, IntoSystemConfig, OnUpdate, Plugin, Query, Res,
         Transform,
     },
     reflect::Reflect,
@@ -52,7 +52,7 @@ impl ShipPlugin {
                 // handle shooting
                 if controls.shoot && shoot_cooldown.0.finished() {
                     let projectile =
-                        ProjectileBundle::from_config(&projectile_config, &xform, &sprites);
+                        ProjectileBundle::from_config(&projectile_config, xform, &sprites);
                     commands.spawn(projectile);
                     shoot_cooldown.0.reset();
                     // TODO: projectile kickback

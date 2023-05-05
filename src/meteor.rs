@@ -56,10 +56,7 @@ impl MeteorSize {
     }
 
     fn can_split(&self) -> bool {
-        match self {
-            Self::Medium | Self::Large => true,
-            _ => false,
-        }
+        matches!(self, Self::Medium | Self::Large)
     }
 }
 
@@ -180,7 +177,6 @@ impl MeteorBundle {
 
         // TODO: level progression
         let bundles: Vec<MeteorBundle> = (0..4)
-            .into_iter()
             .map(|_| {
                 // roll position - make sure it's not too close to the center where the player is
                 // TODO: make configurable

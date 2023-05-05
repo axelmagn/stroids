@@ -5,16 +5,9 @@ use bevy::{
 use bevy_mod_gizmos::GizmosPlugin;
 
 use crate::{
-    collision::CollisionPlugin,
-    config::ConfigPlugin,
-    input::InputPlugin,
-    kinematics::KinematicsPlugin,
-    loading::LoadingPlugin,
-    meteor::MeteorPlugin,
-    player::PlayerPlugin,
-    projectile::{ProjectileBundle, ProjectilePlugin},
-    ship::ShipPlugin,
-    viewport::ViewportPlugin,
+    collision::CollisionPlugin, config::ConfigPlugin, input::InputPlugin,
+    kinematics::KinematicsPlugin, loading::LoadingPlugin, meteor::MeteorPlugin,
+    player::PlayerPlugin, projectile::ProjectilePlugin, ship::ShipPlugin, viewport::ViewportPlugin,
 };
 
 /// Application State.  during development, not all of these will be implemented yet.

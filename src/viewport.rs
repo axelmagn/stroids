@@ -71,9 +71,10 @@ impl ViewportConfig {
         window.prevent_default_event_handling = viewport_config.prevent_default_event_handling;
         window.resolution = WindowResolution::from(viewport_config.resolution);
         // update clear color
-        Color::hex(viewport_config.background_color.clone())
-            .ok() // only handle successful parses
-            .map(|c| clear_color.0 = c); // assign parsed color to clear_color
+        let color_res = Color::hex(viewport_config.background_color.clone());
+        if let Ok(color) = color_res {
+            clear_color.0 = color;
+        }
 
         // update camera zoom
         projections

@@ -38,24 +38,23 @@ pub fn keyboard_input_system(
     mut evw_input_action: EventWriter<InputEvent>,
 ) {
     evr_keys.iter().for_each(|ev| {
-        ev.key_code
+        let action_opt = ev
+            .key_code
             // convert key code to input action
-            .map(|code| match code {
+            .and_then(|code| match code {
                 KeyCode::W | KeyCode::Up => Some(InputAction::Thrust(1.)),
                 KeyCode::S | KeyCode::Down => Some(InputAction::Thrust(-1.)),
                 KeyCode::A | KeyCode::Left => Some(InputAction::Turn(1.)),
                 KeyCode::D | KeyCode::Right => Some(InputAction::Turn(-1.)),
                 KeyCode::Space => Some(InputAction::Shoot),
                 _ => None,
-            })
-            .flatten()
-            // emit input event
-            .map(|action| {
-                evw_input_action.send(InputEvent {
-                    action,
-                    state: ev.state,
-                    scan_code: ev.scan_code,
-                })
             });
+        if let Some(action) = action_opt {
+            evw_input_action.send(InputEvent {
+                action,
+                state: ev.state,
+                scan_code: ev.scan_code,
+            })
+        }
     });
 }

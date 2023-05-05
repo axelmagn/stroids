@@ -19,7 +19,7 @@ use serde::Deserialize;
 
 use crate::{app::AppState, config::Config};
 
-const CONFIG_ASSET_PATH: &'static str = "config.toml";
+const CONFIG_ASSET_PATH: &str = "config.toml";
 
 #[derive(Debug)]
 pub struct LoadingPlugin;
@@ -70,9 +70,9 @@ fn system_preload_setup(mut commands: Commands, asset_server: Res<AssetServer>) 
 
     // display title text
     let title_text_style = TextStyle {
-        font: font.clone(),
         font_size: 256.0,
         color: Color::WHITE,
+        font,
     };
     commands.spawn((
         Text2dBundle {

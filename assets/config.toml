@@ -49,19 +49,19 @@ collision_radius = 32
 
 [meteors.variants.brown.Medium]
 scale = 3
-speed = 48
+speed = 64
 sprites = ["meteor_brown_md_01", "meteor_brown_md_02"]
 collision_radius = 24
 
 [meteors.variants.brown.Small]
 scale = 4
-speed = 64
+speed = 128
 sprites = ["meteor_brown_sm_01", "meteor_brown_sm_02"]
 collision_radius = 16
 
 [meteors.variants.brown.Tiny]
 scale = 4
-speed = 64
+speed = 256
 sprites = ["meteor_brown_tn_01", "meteor_brown_tn_02"]
 collision_radius = 4
 
@@ -80,19 +80,19 @@ collision_radius = 48
 
 [meteors.variants.grey.Medium]
 scale = 3
-speed = 48
+speed = 64
 sprites = ["meteor_grey_md_01", "meteor_grey_md_02"]
 collision_radius = 24
 
 [meteors.variants.grey.Small]
 scale = 4
-speed = 64
+speed = 128
 sprites = ["meteor_grey_sm_01", "meteor_grey_sm_02"]
 collision_radius = 16
 
 [meteors.variants.grey.Tiny]
 scale = 4
-speed = 64
+speed = 256
 sprites = ["meteor_grey_tn_01", "meteor_grey_tn_02"]
 collision_radius = 4
 

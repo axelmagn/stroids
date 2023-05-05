@@ -66,7 +66,7 @@ impl AssetLoader for ConfigLoader {
         Box::pin(async move {
             // TODO: handle error
             let config_str = from_utf8(bytes)?;
-            let config: Config = toml::from_str(&config_str)?;
+            let config: Config = toml::from_str(config_str)?;
             load_context.set_default_asset(LoadedAsset::new(config));
             Ok(())
         })

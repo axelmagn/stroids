@@ -1,8 +1,8 @@
 use bevy::{
     math::Vec3Swizzles,
     prelude::{
-        info, Bundle, Commands, Component, Entity, Image, IntoSystemConfig, OnUpdate, Plugin,
-        Query, Res, Resource, Transform, Vec3,
+        Bundle, Commands, Component, Entity, Image, IntoSystemConfig, OnUpdate, Plugin, Query, Res,
+        Resource, Transform, Vec3,
     },
     sprite::SpriteBundle,
     time::{Time, Timer, TimerMode},

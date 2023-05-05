@@ -94,14 +94,14 @@ pub fn system_handle_input(
     mut q: Query<(&mut ShipControls, &mut PlayerInputMemory), (With<PlayerMarker>,)>,
     mut evr_inputs: EventReader<InputEvent>,
 ) {
-    let inputs: Vec<InputEvent> = evr_inputs.iter().map(|e| e.clone()).collect();
+    let inputs: Vec<InputEvent> = evr_inputs.iter().copied().collect();
     for (mut controls, mut input_mem) in q.iter_mut() {
         inputs.iter().for_each(|ev_input| match ev_input.action {
             InputAction::Thrust(x) => {
                 match (ev_input.state, input_mem.thrust) {
                     (ButtonState::Pressed, _) => {
                         controls.thrust = x.clamp(-1., 1.);
-                        input_mem.thrust = Some(ev_input.clone());
+                        input_mem.thrust = Some(*ev_input);
                     }
                     (ButtonState::Released, Some(prev)) => {
                         if ev_input.scan_code == prev.scan_code {
@@ -117,7 +117,7 @@ pub fn system_handle_input(
             InputAction::Turn(x) => match (ev_input.state, input_mem.turn) {
                 (ButtonState::Pressed, _) => {
                     controls.turn = x.clamp(-1., 1.);
-                    input_mem.turn = Some(ev_input.clone());
+                    input_mem.turn = Some(*ev_input);
                 }
                 (ButtonState::Released, Some(prev)) => {
                     if ev_input.scan_code == prev.scan_code {

@@ -1,8 +1,8 @@
 use bevy::{
     math::Vec3Swizzles,
     prelude::{
-        Bundle, Commands, Component, Image, IntoSystemConfig, OnUpdate, Plugin, Query, Res,
-        Transform,
+        AssetServer, Audio, AudioSource, Bundle, Commands, Component, Image, IntoSystemConfig,
+        OnUpdate, Plugin, Query, Res, Transform,
     },
     reflect::Reflect,
     sprite::SpriteBundle,
@@ -42,7 +42,10 @@ impl ShipPlugin {
         )>,
         projectile_config: Res<ProjectileConfig>,
         sprites: Res<AssetMap<Image>>,
+        audio: Res<Audio>,
+        audio_sources: Res<AssetMap<AudioSource>>,
     ) {
+        let sound = audio_sources.0.get("laser").unwrap();
         q.iter_mut().for_each(
             |(controls, mut shoot_cooldown, config, xform, mut acc, mut racc)| {
                 // update kinematics
@@ -51,10 +54,15 @@ impl ShipPlugin {
                 racc.0 = controls.turn * config.turn_factor;
                 // handle shooting
                 if controls.shoot && shoot_cooldown.0.finished() {
+                    // spawn projectile
                     let projectile =
                         ProjectileBundle::from_config(&projectile_config, xform, &sprites);
                     commands.spawn(projectile);
                     shoot_cooldown.0.reset();
+                    // play projectile sound
+                    // TODO: configure paths
+                    audio.play(sound.clone());
+
                     // TODO: projectile kickback
                 }
             },

@@ -2,8 +2,9 @@ use std::f32::consts::PI;
 
 use bevy::{
     prelude::{
-        Bundle, Commands, Component, Entity, Image, IntoSystemAppConfig, IntoSystemConfig, OnEnter,
-        OnUpdate, Plugin, Query, Res, Resource, Transform, Vec2, Vec3, With,
+        AssetServer, Audio, AudioSource, Bundle, Commands, Component, Entity, Image,
+        IntoSystemAppConfig, IntoSystemConfig, OnEnter, OnUpdate, Plugin, Query, Res, Resource,
+        Transform, Vec2, Vec3, With,
     },
     sprite::SpriteBundle,
     utils::{default, HashMap},
@@ -207,7 +208,10 @@ impl MeteorBundle {
         mut commands: Commands,
         q_meteors: Query<(&Transform, &Collider), With<MeteorBehavior>>,
         q_player: Query<(Entity, &Transform, &Collider), With<PlayerMarker>>,
+        audio_sources: Res<AssetMap<AudioSource>>,
+        audio: Res<Audio>,
     ) {
+        let sound = audio_sources.0.get("explosion").unwrap();
         for (player_entity, player_xform, player_collider) in q_player.iter() {
             for (meteor_xform, meteor_collider) in q_meteors.iter() {
                 if Collider::is_collision(
@@ -216,6 +220,7 @@ impl MeteorBundle {
                 ) {
                     // TODO: emit & handle player death event
                     commands.entity(player_entity).despawn();
+                    audio.play(sound.clone());
                 }
             }
         }
@@ -227,7 +232,11 @@ impl MeteorBundle {
         q_projectile: Query<(Entity, &Transform, &Collider), With<ProjectileComponent>>,
         meteors_config: Res<MeteorsConfig>,
         images: Res<AssetMap<Image>>,
+        audio_sources: Res<AssetMap<AudioSource>>,
+        audio: Res<Audio>,
     ) {
+        // TODO: configure
+        let sound = audio_sources.0.get("explosion").unwrap();
         for (projectile_entity, projectile_xform, projectile_collider) in q_projectile.iter() {
             for (meteor_entity, meteor_xform, meteor_collider, meteor_behavior) in q_meteors.iter()
             {
@@ -235,6 +244,7 @@ impl MeteorBundle {
                     (projectile_xform, projectile_collider),
                     (meteor_xform, meteor_collider),
                 ) {
+                    // destroy projectile and meteor
                     commands.entity(projectile_entity).despawn();
                     commands.entity(meteor_entity).despawn();
                     // split meteor if possible
@@ -255,6 +265,8 @@ impl MeteorBundle {
                             .collect();
                         commands.spawn_batch(children);
                     }
+                    // play explosion sound
+                    audio.play(sound.clone());
                 }
             }
         }

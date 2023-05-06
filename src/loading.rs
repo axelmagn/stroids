@@ -8,7 +8,7 @@ use std::collections::HashMap;
 use bevy::{
     asset::{Asset, LoadState},
     prelude::{
-        info, AssetServer, Assets, Audio, Color, Commands, Component, Entity, Handle,
+        info, AssetServer, Assets, Audio, AudioSource, Color, Commands, Component, Entity, Handle,
         HandleUntyped, Image, IntoSystemAppConfig, IntoSystemConfig, NextState, OnEnter, OnExit,
         OnUpdate, Plugin, Query, Res, ResMut, Resource, Transform, Vec3, With,
     },
@@ -142,17 +142,18 @@ fn system_loading_setup(
     commands.insert_resource(AssetMap(images));
 
     // load audio
-    let audio: HashMap<String, Handle<Audio>> = assets_config
+    let audio_sources: HashMap<String, Handle<AudioSource>> = assets_config
         .assets
         .audio
         .iter()
         .map(|(k, v)| {
-            let handle: Handle<Audio> = asset_server.load(v);
+            let handle: Handle<AudioSource> = asset_server.load(v);
             // track loaded images in the loading list
             loading.0.push(handle.clone_untyped());
             (k.clone(), handle)
         })
         .collect();
+    commands.insert_resource(AssetMap(audio_sources));
 
     // insert loading tracker as a resource
     commands.insert_resource(loading);

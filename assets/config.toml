@@ -36,7 +36,7 @@ turn_factor = 40.0
 velocity_damping = 0.8
 rotation_rate_damping = 8.0
 sprite_id = "player_ship_orange"
-collision_radius = 75
+collision_radius = 16
 shoot_cooldown = 0.5
 
 [meteors.variants.brown]

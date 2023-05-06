@@ -22,11 +22,46 @@ opt-level = 's'
 lto = "thin"
 
 [dependencies]
-bevy = { version = "0.10.1", features = ["subpixel_glyph_atlas"] }
 bevy-inspector-egui = "0.18.3"
+bevy_kira_audio = "0.15.0"
 bevy_mod_gizmos = "0.4.0"
 clap = { version = "4.2.5", features = ["derive"] }
 rand = "0.8.5"
 serde = "1.0.160"
 toml = "0.7.3"
 wasm-bindgen = "0.2.84"
+
+[dependencies.bevy]
+version = "0.10.1"
+default-features = false
+# These are the remaining default features other than `bevy_audio` and `vorbis`
+features = [
+  "animation",
+  "bevy_asset",
+#   "bevy_audio",
+  "bevy_gilrs",
+  "bevy_scene",
+  "bevy_winit",
+  "bevy_core_pipeline",
+  "bevy_pbr",
+  "bevy_gltf",
+  "bevy_render",
+  "bevy_sprite",
+  "bevy_text",
+  "bevy_ui",
+  "png",
+  "hdr",
+  "ktx2",
+  "zstd",
+#   "vorbis",
+  "x11",
+  "filesystem_watcher",
+  "android_shared_stdcxx",
+  "tonemapping_luts",
+  
+  "subpixel_glyph_atlas",
+]
+
+# [dependencies.web-sys]
+# version = "0.3.61"
+# features = [ 'AudioContext',]

@@ -8,9 +8,9 @@ use std::collections::HashMap;
 use bevy::{
     asset::{Asset, LoadState},
     prelude::{
-        info, AssetServer, Assets, Color, Commands, Component, Entity, Handle, HandleUntyped,
-        Image, IntoSystemAppConfig, IntoSystemConfig, NextState, OnEnter, OnExit, OnUpdate, Plugin,
-        Query, Res, ResMut, Resource, Transform, Vec3, With,
+        info, AssetServer, Assets, Audio, Color, Commands, Component, Entity, Handle,
+        HandleUntyped, Image, IntoSystemAppConfig, IntoSystemConfig, NextState, OnEnter, OnExit,
+        OnUpdate, Plugin, Query, Res, ResMut, Resource, Transform, Vec3, With,
     },
     text::{Font, Text, Text2dBundle, TextStyle},
     utils::default,
@@ -48,6 +48,7 @@ pub struct AssetMap<T: Asset>(pub HashMap<String, Handle<T>>);
 #[derive(Debug, Clone, Resource, Deserialize)]
 pub struct AssetsConfig {
     pub images: HashMap<String, String>,
+    pub audio: HashMap<String, String>,
 }
 
 #[derive(Debug, Clone, Resource, Default)]
@@ -139,6 +140,19 @@ fn system_loading_setup(
         })
         .collect();
     commands.insert_resource(AssetMap(images));
+
+    // load audio
+    let audio: HashMap<String, Handle<Audio>> = assets_config
+        .assets
+        .audio
+        .iter()
+        .map(|(k, v)| {
+            let handle: Handle<Audio> = asset_server.load(v);
+            // track loaded images in the loading list
+            loading.0.push(handle.clone_untyped());
+            (k.clone(), handle)
+        })
+        .collect();
 
     // insert loading tracker as a resource
     commands.insert_resource(loading);

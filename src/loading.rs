@@ -8,13 +8,14 @@ use std::collections::HashMap;
 use bevy::{
     asset::{Asset, LoadState},
     prelude::{
-        info, AssetServer, Assets, Audio, AudioSource, Color, Commands, Component, Entity, Handle,
-        HandleUntyped, Image, IntoSystemAppConfig, IntoSystemConfig, NextState, OnEnter, OnExit,
-        OnUpdate, Plugin, Query, Res, ResMut, Resource, Transform, Vec3, With,
+        info, AssetServer, Assets, Color, Commands, Component, Entity, Handle, HandleUntyped,
+        Image, IntoSystemAppConfig, IntoSystemConfig, NextState, OnEnter, OnExit, OnUpdate, Plugin,
+        Query, Res, ResMut, Resource, Transform, Vec3, With,
     },
     text::{Font, Text, Text2dBundle, TextStyle},
     utils::default,
 };
+use bevy_kira_audio::AudioSource;
 use serde::Deserialize;
 
 use crate::{app::AppState, config::Config};

@@ -1,13 +1,14 @@
 use bevy::{
     math::Vec3Swizzles,
     prelude::{
-        AssetServer, Audio, AudioSource, Bundle, Commands, Component, Image, IntoSystemConfig,
-        OnUpdate, Plugin, Query, Res, Transform,
+        Bundle, Commands, Component, Image, IntoSystemConfig, OnUpdate, Plugin, Query, Res,
+        Transform,
     },
     reflect::Reflect,
     sprite::SpriteBundle,
     time::{Time, Timer},
 };
+use bevy_kira_audio::{Audio, AudioControl, AudioSource};
 use serde::Deserialize;
 
 use crate::{

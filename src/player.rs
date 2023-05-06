@@ -1,14 +1,14 @@
 use bevy::{
     input::ButtonState,
     prelude::{
-        App, AssetServer, Audio, Bundle, Commands, Component, EventReader, Image,
-        IntoSystemAppConfig, IntoSystemConfig, OnEnter, OnUpdate, Plugin, Query, Res, Resource,
-        With,
+        App, Assets, Bundle, Commands, Component, EventReader, Handle, Image, IntoSystemAppConfig,
+        IntoSystemConfig, OnEnter, OnUpdate, Plugin, Query, Res, ResMut, Resource, With,
     },
     sprite::SpriteBundle,
     time::{Timer, TimerMode},
     utils::default,
 };
+use bevy_kira_audio::{Audio, AudioControl, AudioInstance, AudioSource, AudioTween};
 use serde::Deserialize;
 
 use crate::{
@@ -27,11 +27,15 @@ impl Plugin for PlayerPlugin {
     fn build(&self, app: &mut App) {
         app.add_system(system_spawn.in_schedule(OnEnter(AppState::InGame)));
         app.add_system(system_handle_input.in_set(OnUpdate(AppState::InGame)));
+        app.add_system(system_thruster_sound.in_set(OnUpdate(AppState::InGame)));
     }
 }
 
 #[derive(Component, Default, Debug)]
 pub struct PlayerMarker;
+
+#[derive(Resource, Default, Debug)]
+pub struct ThrusterSound(Handle<AudioInstance>);
 
 #[derive(Component, Default, Debug)]
 pub struct PlayerInputMemory {
@@ -58,6 +62,9 @@ pub fn system_spawn(
     mut commands: Commands,
     loaded_images: Res<AssetMap<Image>>,
     config: Res<PlayerConfig>,
+    loaded_audio: Res<AssetMap<AudioSource>>,
+    audio: Res<Audio>,
+    mut audio_instances: ResMut<Assets<AudioInstance>>,
 ) {
     // TODO: get ShipBundle from ShipConfig
     let sprite_id = &config.ship.sprite_id;
@@ -89,6 +96,27 @@ pub fn system_spawn(
         },
     };
     commands.spawn(player);
+    // thruster sound
+    let sound = loaded_audio.0.get("thruster").unwrap();
+    let handle = audio.play(sound.clone()).looped().handle();
+    commands.insert_resource(ThrusterSound(handle.clone()));
+    if let Some(instance) = audio_instances.get_mut(&handle) {
+        instance.set_volume(0., AudioTween::default());
+    }
+}
+
+pub fn system_thruster_sound(
+    thruster_sound: Res<ThrusterSound>,
+    mut audio_instances: ResMut<Assets<AudioInstance>>,
+    q: Query<&ShipControls, With<PlayerMarker>>,
+) {
+    if q.is_empty() {
+        return;
+    }
+    let controls = q.single();
+    if let Some(instance) = audio_instances.get_mut(&thruster_sound.0) {
+        instance.set_volume(controls.thrust as f64, AudioTween::default());
+    }
 }
 
 pub fn system_handle_input(

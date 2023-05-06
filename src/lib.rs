@@ -10,6 +10,7 @@ mod meteor;
 mod player;
 mod projectile;
 mod ship;
+mod sounds;
 mod viewport;
 
 #[wasm_bindgen]

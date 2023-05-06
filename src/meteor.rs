@@ -2,13 +2,13 @@ use std::f32::consts::PI;
 
 use bevy::{
     prelude::{
-        AssetServer, Audio, AudioSource, Bundle, Commands, Component, Entity, Image,
-        IntoSystemAppConfig, IntoSystemConfig, OnEnter, OnUpdate, Plugin, Query, Res, Resource,
-        Transform, Vec2, Vec3, With,
+        Bundle, Commands, Component, Entity, Image, IntoSystemAppConfig, IntoSystemConfig, OnEnter,
+        OnUpdate, Plugin, Query, Res, Resource, Transform, Vec2, Vec3, With,
     },
     sprite::SpriteBundle,
     utils::{default, HashMap},
 };
+use bevy_kira_audio::{Audio, AudioControl, AudioSource};
 use rand::{distributions::Uniform, thread_rng, Rng};
 use serde::Deserialize;
 

@@ -29,6 +29,7 @@ meteor_grey_tn_02 = "space_shooter/Meteors/meteorGrey_tiny2.png"
 laser = "scifi_sounds/laserRetro_001.ogg"
 explosion = "scifi_sounds/explosionCrunch_000.ogg"
 thruster = "scifi_sounds/thrusterFire_000.ogg"
+music = "music_loops/Alpha Dance.ogg"
 
 [player.ship]
 thrust_factor = 800.0

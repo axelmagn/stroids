@@ -2,12 +2,14 @@ use bevy::{
     prelude::{App, ClearColor, Color, States},
     DefaultPlugins,
 };
+use bevy_kira_audio::AudioPlugin;
 use bevy_mod_gizmos::GizmosPlugin;
 
 use crate::{
     collision::CollisionPlugin, config::ConfigPlugin, input::InputPlugin,
     kinematics::KinematicsPlugin, loading::LoadingPlugin, meteor::MeteorPlugin,
-    player::PlayerPlugin, projectile::ProjectilePlugin, ship::ShipPlugin, viewport::ViewportPlugin,
+    player::PlayerPlugin, projectile::ProjectilePlugin, ship::ShipPlugin, sounds::SoundsPlugin,
+    viewport::ViewportPlugin,
 };
 
 /// Application State.  during development, not all of these will be implemented yet.
@@ -34,8 +36,10 @@ pub fn run() {
     App::new()
         .add_state::<AppState>()
         .add_plugins(DefaultPlugins)
+        .add_plugin(AudioPlugin)
         .add_plugin(GizmosPlugin)
         // .add_plugin(WorldInspectorPlugin::new())
+        // Game Plugins
         .add_plugin(CollisionPlugin)
         .add_plugin(ConfigPlugin)
         .add_plugin(InputPlugin)
@@ -45,6 +49,7 @@ pub fn run() {
         .add_plugin(PlayerPlugin)
         .add_plugin(ProjectilePlugin)
         .add_plugin(ShipPlugin)
+        .add_plugin(SoundsPlugin)
         .add_plugin(ViewportPlugin)
         .insert_resource(ClearColor(Color::BLACK))
         .run();

@@ -2,17 +2,23 @@
 
 use bevy::{
     input::{keyboard::KeyboardInput, ButtonState},
-    prelude::{EventReader, EventWriter, IntoSystemConfig, KeyCode, OnUpdate, Plugin},
+    math::Vec3Swizzles,
+    prelude::{
+        Component, EventReader, EventWriter, Events, Input, IntoSystemConfig, KeyCode, MouseButton,
+        OnUpdate, Plugin, Query, Res, Transform,
+    },
+    window::Window,
 };
 
-use crate::app::AppState;
+use crate::{app::AppState, collision::Collider};
 
 pub struct InputPlugin;
 
 impl Plugin for InputPlugin {
     fn build(&self, app: &mut bevy::prelude::App) {
         app.add_event::<InputEvent>();
-        app.add_system(keyboard_input_system.in_set(OnUpdate(AppState::InGame)));
+        app.add_system(system_keyboard_input.in_set(OnUpdate(AppState::InGame)));
+        app.add_system(system_click_input);
     }
 }
 
@@ -33,7 +39,7 @@ pub struct InputEvent {
 
 /// A quick and dirty keyboard input mapping
 /// TODO: replace hardcoded keys with configured values
-pub fn keyboard_input_system(
+pub fn system_keyboard_input(
     mut evr_keys: EventReader<KeyboardInput>,
     mut evw_input_action: EventWriter<InputEvent>,
 ) {
@@ -57,4 +63,32 @@ pub fn keyboard_input_system(
             })
         }
     });
+}
+
+#[derive(Debug, Default, Component)]
+pub struct ClickListener(pub Events<Input<MouseButton>>);
+
+pub fn system_click_input(
+    input_mouse: Res<Input<MouseButton>>,
+    mut listeners: Query<(&mut ClickListener, &Collider, &Transform)>,
+    windows: Query<&Window>,
+) {
+    if windows.is_empty() {
+        return;
+    }
+    let window = windows.single();
+    if window.cursor_position().is_none() {
+        return;
+    }
+    let cursor_pos = window.cursor_position().unwrap();
+
+    listeners
+        .iter_mut()
+        .for_each(|(mut listener, collider, xform)| {
+            listener.0.update();
+            let dist = xform.translation.xy().distance(cursor_pos);
+            if input_mouse.get_just_pressed().len() > 0 && dist <= collider.radius {
+                listener.0.send(input_mouse.clone());
+            }
+        });
 }

@@ -24,6 +24,8 @@ meteor_grey_sm_01 = "space_shooter/Meteors/meteorGrey_small1.png"
 meteor_grey_sm_02 = "space_shooter/Meteors/meteorGrey_small2.png"
 meteor_grey_tn_01 = "space_shooter/Meteors/meteorGrey_tiny1.png"
 meteor_grey_tn_02 = "space_shooter/Meteors/meteorGrey_tiny2.png"
+sound_on = "game_icons/musicOn.png"
+sound_off = "game_icons/musicOff.png"
 
 [assets.audio]
 laser = "scifi_sounds/laserRetro_001.ogg"

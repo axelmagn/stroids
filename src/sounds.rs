@@ -1,6 +1,6 @@
 use bevy::{
     prelude::{
-        Commands, Component, Handle, Image, Input, IntoSystemAppConfig, IntoSystemConfig,
+        info, Commands, Component, Handle, Image, Input, IntoSystemAppConfig, IntoSystemConfig,
         MouseButton, OnEnter, OnUpdate, Plugin, Query, Res, ResMut, Resource, Transform, Vec3,
         With,
     },
@@ -56,7 +56,7 @@ impl SoundsPlugin {
             },
             SoundButton,
             ClickListener::default(),
-            Collider { radius: 16. },
+            Collider { radius: 32. },
         );
         commands.spawn(sound_button);
         commands.insert_resource(sound_on);
@@ -76,8 +76,10 @@ impl SoundsPlugin {
                     .collect::<Vec<_>>()
             })
             .for_each(|ev| {
+                info!("system_update_sound_state: mouse event {:?}", ev); // debug
                 if ev.just_pressed(MouseButton::Left) {
-                    sound_on.0 = !sound_on.0
+                    sound_on.0 = !sound_on.0;
+                    info!("system_update_sound_state: changed sound ({})", sound_on.0);
                 }
             });
     }

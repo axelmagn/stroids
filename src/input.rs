@@ -4,13 +4,13 @@ use bevy::{
     input::{keyboard::KeyboardInput, ButtonState},
     math::Vec3Swizzles,
     prelude::{
-        Component, EventReader, EventWriter, Events, Input, IntoSystemConfig, KeyCode, MouseButton,
-        OnUpdate, Plugin, Query, Res, Transform,
+        info, Camera, Component, EventReader, EventWriter, Events, GlobalTransform, Input,
+        IntoSystemConfig, KeyCode, MouseButton, OnUpdate, Plugin, Query, Res, Transform, With,
     },
     window::Window,
 };
 
-use crate::{app::AppState, collision::Collider};
+use crate::{app::AppState, collision::Collider, viewport::PrimaryCameraMarker};
 
 pub struct InputPlugin;
 
@@ -72,6 +72,7 @@ pub fn system_click_input(
     input_mouse: Res<Input<MouseButton>>,
     mut listeners: Query<(&mut ClickListener, &Collider, &Transform)>,
     windows: Query<&Window>,
+    camera_q: Query<(&Camera, &GlobalTransform), With<PrimaryCameraMarker>>,
 ) {
     if windows.is_empty() {
         return;
@@ -80,15 +81,30 @@ pub fn system_click_input(
     if window.cursor_position().is_none() {
         return;
     }
-    let cursor_pos = window.cursor_position().unwrap();
+    let cursor_pos_window = window.cursor_position().unwrap();
+    let (camera, camera_transform) = camera_q.single();
+    let cursor_pos = camera
+        .viewport_to_world(camera_transform, cursor_pos_window)
+        .unwrap()
+        .origin
+        .truncate();
 
     listeners
         .iter_mut()
         .for_each(|(mut listener, collider, xform)| {
+            info!("system_click_input: found listener"); // debug
             listener.0.update();
             let dist = xform.translation.xy().distance(cursor_pos);
-            if input_mouse.get_just_pressed().len() > 0 && dist <= collider.radius {
-                listener.0.send(input_mouse.clone());
+            if input_mouse.get_just_pressed().len() > 0 {
+                info!(
+                    "system_click_input: mouse clicked (dist: {}, xform: {}, cursor: {})",
+                    dist,
+                    xform.translation.xy(),
+                    cursor_pos,
+                ); // debug
+                if dist <= collider.radius {
+                    listener.0.send(input_mouse.clone());
+                }
             }
         });
 }

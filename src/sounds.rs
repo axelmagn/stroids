@@ -1,8 +1,7 @@
 use bevy::{
     prelude::{
-        info, Commands, Component, Handle, Image, IntoSystemAppConfig, IntoSystemConfig,
-        MouseButton, OnEnter, OnUpdate, Plugin, Query, Res, ResMut, Resource, Transform, Vec3,
-        With,
+        Commands, Component, Handle, Image, IntoSystemAppConfig, IntoSystemConfig, MouseButton,
+        OnEnter, OnUpdate, Plugin, Query, Res, ResMut, Resource, Transform, Vec3, With,
     },
     sprite::SpriteBundle,
     utils::default,

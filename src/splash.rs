@@ -1,10 +1,9 @@
 use bevy::{
     prelude::{
-        default, AssetServer, Color, Commands, Component, Entity, Input, IntoSystemAppConfig,
-        IntoSystemConfig, MouseButton, NextState, OnEnter, OnExit, OnUpdate, Plugin, Query, Res,
-        ResMut, Transform, Vec3, With,
+        default, AssetServer, Color, Commands, Component, Entity, IntoSystemAppConfig,
+        IntoSystemConfig, NextState, OnEnter, OnExit, OnUpdate, Plugin, Query, Res, ResMut,
+        Transform, Vec3, With,
     },
-    render::view,
     text::{Text, Text2dBundle, TextStyle},
 };
 
@@ -68,7 +67,7 @@ impl SplashPlugin {
             .iter_mut()
             .flat_map(|mut listener| listener.0.drain().collect::<Vec<_>>())
             .collect();
-        if events.len() > 0 {
+        if !events.is_empty() {
             next_state.set(AppState::InGame);
         }
     }

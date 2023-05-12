@@ -66,26 +66,11 @@ struct StatusTextMarker;
 
 /// Initiate asset preloading
 fn system_preload_setup(mut commands: Commands, asset_server: Res<AssetServer>) {
-    // load font
-    let font = asset_server.load("fira_sans/FiraSans-Regular.ttf");
-    // let font = asset_server.load("kenney_fonts/Kenney Future.ttf");
-    commands.insert_resource(LoadingFont(font.clone()));
+    let loading_font = asset_server.load("fira_sans/FiraSans-Regular.ttf");
+    commands.insert_resource(LoadingFont(loading_font));
 
-    // // display title text
-    // let title_text_style = TextStyle {
-    //     font_size: 128.0,
-    //     color: Color::WHITE,
-    //     font,
-    // };
-    // commands.spawn((
-    //     Text2dBundle {
-    //         text: Text::from_section("Stroids", title_text_style),
-    //         ..default()
-    //     },
-    //     TitleTextMarker,
-    // ));
-    let title_font = asset_server.load("kenney_fonts/Kenney Future.ttf");
     // display title text
+    let title_font = asset_server.load("kenney_fonts/Kenney Future.ttf");
     let title_text_style = TextStyle {
         font_size: 256. + 128.,
         color: Color::WHITE,

@@ -6,7 +6,7 @@ use bevy::{
     input::{keyboard::KeyboardInput, ButtonState},
     math::Vec3Swizzles,
     prelude::{
-        info, Camera, Component, EventReader, EventWriter, Events, GlobalTransform, Input,
+        Camera, Component, EventReader, EventWriter, Events, GlobalTransform, Input,
         IntoSystemConfig, KeyCode, MouseButton, OnUpdate, Plugin, Query, Res, Transform, With,
     },
     window::Window,
@@ -106,7 +106,7 @@ pub fn system_click_input(
             })
             .collect();
         // exit early if no components were clicked
-        if clicked.len() == 0 {
+        if clicked.is_empty() {
             return;
         }
         // send a click event to whichever is on top (Z order). If multiple

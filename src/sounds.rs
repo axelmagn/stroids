@@ -1,6 +1,6 @@
 use bevy::{
     prelude::{
-        info, Commands, Component, Handle, Image, Input, IntoSystemAppConfig, IntoSystemConfig,
+        info, Commands, Component, Handle, Image, IntoSystemAppConfig, IntoSystemConfig,
         MouseButton, OnEnter, OnUpdate, Plugin, Query, Res, ResMut, Resource, Transform, Vec3,
         With,
     },
@@ -18,10 +18,12 @@ pub struct SoundsPlugin;
 
 impl Plugin for SoundsPlugin {
     fn build(&self, app: &mut bevy::prelude::App) {
-        app.add_system(Self::system_start_music.in_schedule(OnEnter(AppState::InGame)));
         app.add_system(Self::system_spawn_sound_button.in_schedule(OnEnter(AppState::InGame)));
-        app.add_system(Self::system_update_sound_state.in_set(OnUpdate(AppState::InGame)));
+        app.add_system(Self::system_start_music.in_schedule(OnEnter(AppState::InGame)));
+
+        app.add_system(Self::system_handle_sound_button_clicked.in_set(OnUpdate(AppState::InGame)));
         app.add_system(Self::system_update_sound_button.in_set(OnUpdate(AppState::InGame)));
+        app.add_system(Self::system_update_sound_volume.in_set(OnUpdate(AppState::InGame)));
     }
 }
 
@@ -62,19 +64,12 @@ impl SoundsPlugin {
         commands.insert_resource(sound_on);
     }
 
-    fn system_update_sound_state(
-        q: Query<&ClickListener, With<SoundButton>>,
+    fn system_handle_sound_button_clicked(
+        mut q: Query<&mut ClickListener, With<SoundButton>>,
         mut sound_on: ResMut<SoundOn>,
     ) {
-        q.iter()
-            .flat_map(|listener| {
-                listener
-                    .0
-                    .get_reader()
-                    .iter(&listener.0)
-                    .cloned()
-                    .collect::<Vec<_>>()
-            })
+        q.iter_mut()
+            .flat_map(|mut listener| listener.0.drain().collect::<Vec<_>>())
             .for_each(|ev| {
                 info!("system_update_sound_state: mouse event {:?}", ev); // debug
                 if ev.just_pressed(MouseButton::Left) {
@@ -82,6 +77,14 @@ impl SoundsPlugin {
                     info!("system_update_sound_state: changed sound ({})", sound_on.0);
                 }
             });
+    }
+
+    fn system_update_sound_volume(audio: Res<Audio>, sound_on: Res<SoundOn>) {
+        if sound_on.0 {
+            audio.set_volume(1.);
+        } else {
+            audio.set_volume(0.);
+        }
     }
 
     fn system_update_sound_button(

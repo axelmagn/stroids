@@ -65,9 +65,11 @@ pub fn system_keyboard_input(
     });
 }
 
+// deprecated
 #[derive(Debug, Default, Component)]
 pub struct ClickListener(pub Events<Input<MouseButton>>);
 
+// deprecated
 pub fn system_click_input(
     input_mouse: Res<Input<MouseButton>>,
     mut listeners: Query<(&mut ClickListener, &Collider, &Transform)>,
@@ -92,8 +94,6 @@ pub fn system_click_input(
     listeners
         .iter_mut()
         .for_each(|(mut listener, collider, xform)| {
-            info!("system_click_input: found listener"); // debug
-            listener.0.update();
             let dist = xform.translation.xy().distance(cursor_pos);
             if input_mouse.get_just_pressed().len() > 0 {
                 info!(

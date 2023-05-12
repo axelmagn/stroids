@@ -64,12 +64,13 @@ impl SplashPlugin {
         mut q: Query<&mut ClickListener, With<SplashClickListener>>,
         mut next_state: ResMut<NextState<AppState>>,
     ) {
-        q.iter_mut().for_each(|mut listener| {
-            let events: Vec<_> = listener.0.drain().collect();
-            if events.len() > 0 {
-                next_state.set(AppState::InGame);
-            }
-        });
+        let events: Vec<_> = q
+            .iter_mut()
+            .flat_map(|mut listener| listener.0.drain().collect::<Vec<_>>())
+            .collect();
+        if events.len() > 0 {
+            next_state.set(AppState::InGame);
+        }
     }
 
     fn system_cleanup(mut commands: Commands, q: Query<Entity, With<SplashCleanup>>) {

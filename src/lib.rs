@@ -11,6 +11,7 @@ mod player;
 mod projectile;
 mod ship;
 mod sounds;
+mod splash;
 mod viewport;
 
 #[wasm_bindgen]

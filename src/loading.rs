@@ -67,22 +67,23 @@ struct StatusTextMarker;
 /// Initiate asset preloading
 fn system_preload_setup(mut commands: Commands, asset_server: Res<AssetServer>) {
     // load font
-    let font = asset_server.load("fira_sans/FiraSans-Regular.ttf");
-    commands.insert_resource(LoadingFont(font.clone()));
+    // let font = asset_server.load("fira_sans/FiraSans-Regular.ttf");
+    // let font = asset_server.load("kenney_fonts/Kenney Future.ttf");
+    // commands.insert_resource(LoadingFont(font.clone()));
 
-    // display title text
-    let title_text_style = TextStyle {
-        font_size: 256.0,
-        color: Color::WHITE,
-        font,
-    };
-    commands.spawn((
-        Text2dBundle {
-            text: Text::from_section("Stroids", title_text_style),
-            ..default()
-        },
-        StateTextMarker,
-    ));
+    // // display title text
+    // let title_text_style = TextStyle {
+    //     font_size: 128.0,
+    //     color: Color::WHITE,
+    //     font,
+    // };
+    // commands.spawn((
+    //     Text2dBundle {
+    //         text: Text::from_section("Stroids", title_text_style),
+    //         ..default()
+    //     },
+    //     TitleTextMarker,
+    // ));
 
     // start loading config
     let config_handle: Handle<Config> = asset_server.load(CONFIG_ASSET_PATH);
@@ -110,7 +111,7 @@ fn system_preload_watch_config(
                 .expect("Expected Config to be available after loading.");
             commands.insert_resource(config.clone());
             commands.remove_resource::<LoadingConfig>();
-            next_state.set(AppState::Loading);
+            next_state.set(AppState::Splash);
             info!("Config loaded");
         }
         _ => {

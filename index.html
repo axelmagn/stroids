@@ -39,26 +39,29 @@
 <body>
 	<script type="module">
 		import init, { run_app } from "./pkg/stroids.js";
+		init().then(() => {
+			run_app();
+		});
 
 		// TODO: create AudioContext as part of rust program
-		let context;
-		let running = false;
-		window.onload = function () {
-			context = new AudioContext();
+		// let context;
+		// let running = false;
+		// window.onload = function () {
+		// 	context = new AudioContext();
 
-		}
+		// }
 
-		init().then(() => {
-			document.addEventListener('click', function (e) {
-				document.removeEventListener('click', this);
-				if (!running) {
-					running = true;
-					context.resume().then(() => {
-						run_app();
-					});
-				}
-			});
-		});
+		// init().then(() => {
+		// 	document.addEventListener('click', function (e) {
+		// 		document.removeEventListener('click', this);
+		// 		if (!running) {
+		// 			running = true;
+		// 			context.resume().then(() => {
+		// 				run_app();
+		// 			});
+		// 		}
+		// 	});
+		// });
 	</script>
 </body>
 

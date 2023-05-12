@@ -9,7 +9,7 @@ use crate::{
     collision::CollisionPlugin, config::ConfigPlugin, input::InputPlugin,
     kinematics::KinematicsPlugin, loading::LoadingPlugin, meteor::MeteorPlugin,
     player::PlayerPlugin, projectile::ProjectilePlugin, ship::ShipPlugin, sounds::SoundsPlugin,
-    viewport::ViewportPlugin,
+    splash::SplashPlugin, viewport::ViewportPlugin,
 };
 
 /// Application State.  during development, not all of these will be implemented yet.
@@ -18,6 +18,9 @@ pub enum AppState {
     /// Load the bare essentials (such as config), so that we know what to do in the Loading state.
     #[default]
     PreLoading,
+    /// Show a splash screen, inviting the player to click play.
+    /// Clicking play triggers web initialization that requires player input.
+    Splash,
     /// Load the game's assets
     /// Unimplemented
     Loading,
@@ -32,6 +35,7 @@ pub enum AppState {
 }
 
 pub fn run() {
+    let clear_color = Color::hex("080811").unwrap();
     // run app
     App::new()
         .add_state::<AppState>()
@@ -50,7 +54,8 @@ pub fn run() {
         .add_plugin(ProjectilePlugin)
         .add_plugin(ShipPlugin)
         .add_plugin(SoundsPlugin)
+        .add_plugin(SplashPlugin)
         .add_plugin(ViewportPlugin)
-        .insert_resource(ClearColor(Color::BLACK))
+        .insert_resource(ClearColor(clear_color))
         .run();
 }

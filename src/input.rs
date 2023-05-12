@@ -1,5 +1,7 @@
 //! Module for handling player input
 
+use std::cmp::Ordering;
+
 use bevy::{
     input::{keyboard::KeyboardInput, ButtonState},
     math::Vec3Swizzles,
@@ -65,11 +67,9 @@ pub fn system_keyboard_input(
     });
 }
 
-// deprecated
 #[derive(Debug, Default, Component)]
 pub struct ClickListener(pub Events<Input<MouseButton>>);
 
-// deprecated
 pub fn system_click_input(
     input_mouse: Res<Input<MouseButton>>,
     mut listeners: Query<(&mut ClickListener, &Collider, &Transform)>,
@@ -91,20 +91,41 @@ pub fn system_click_input(
         .origin
         .truncate();
 
-    listeners
-        .iter_mut()
-        .for_each(|(mut listener, collider, xform)| {
-            let dist = xform.translation.xy().distance(cursor_pos);
-            if input_mouse.get_just_pressed().len() > 0 {
-                info!(
-                    "system_click_input: mouse clicked (dist: {}, xform: {}, cursor: {})",
-                    dist,
-                    xform.translation.xy(),
-                    cursor_pos,
-                ); // debug
+    if input_mouse.get_just_pressed().len() > 0 {
+        // get all clicked listeners
+        let mut clicked: Vec<_> = listeners
+            .iter_mut()
+            .flat_map(|(listener, collider, xform)| {
+                let dist = xform.translation.xy().distance(cursor_pos);
                 if dist <= collider.radius {
-                    listener.0.send(input_mouse.clone());
+                    Some((listener, xform))
+                    // listener.0.send(input_mouse.clone());
+                } else {
+                    None
                 }
-            }
-        });
+            })
+            .collect();
+        // exit early if no components were clicked
+        if clicked.len() == 0 {
+            return;
+        }
+        // send a click event to whichever is on top (Z order). If multiple
+        // components have the same z value, all of them get clicked.
+        let clicked_z = clicked
+            .iter()
+            .map(|(_, xform)| xform.translation.z)
+            .min_by(|a, b| a.partial_cmp(b).unwrap_or(Ordering::Equal))
+            .unwrap();
+        clicked
+            .iter_mut()
+            .filter(|(_, xform)| {
+                xform
+                    .translation
+                    .z
+                    .partial_cmp(&clicked_z)
+                    .unwrap_or(Ordering::Equal)
+                    == Ordering::Equal
+            })
+            .for_each(|(ref mut listener, _)| listener.0.send(input_mouse.clone()));
+    }
 }

@@ -18,7 +18,7 @@ use bevy::{
 use bevy_kira_audio::AudioSource;
 use serde::Deserialize;
 
-use crate::{app::AppState, config::Config};
+use crate::{app::AppState, config::Config, splash::SplashCleanup};
 
 const CONFIG_ASSET_PATH: &str = "config.toml";
 
@@ -67,9 +67,9 @@ struct StatusTextMarker;
 /// Initiate asset preloading
 fn system_preload_setup(mut commands: Commands, asset_server: Res<AssetServer>) {
     // load font
-    // let font = asset_server.load("fira_sans/FiraSans-Regular.ttf");
+    let font = asset_server.load("fira_sans/FiraSans-Regular.ttf");
     // let font = asset_server.load("kenney_fonts/Kenney Future.ttf");
-    // commands.insert_resource(LoadingFont(font.clone()));
+    commands.insert_resource(LoadingFont(font.clone()));
 
     // // display title text
     // let title_text_style = TextStyle {
@@ -84,6 +84,24 @@ fn system_preload_setup(mut commands: Commands, asset_server: Res<AssetServer>) 
     //     },
     //     TitleTextMarker,
     // ));
+    let title_font = asset_server.load("kenney_fonts/Kenney Future.ttf");
+    // display title text
+    let title_text_style = TextStyle {
+        font_size: 256. + 128.,
+        color: Color::WHITE,
+        font: title_font,
+    };
+    commands.spawn((
+        Text2dBundle {
+            text: Text::from_section("Stroids", title_text_style),
+            transform: Transform {
+                translation: Vec3::new(0., 0., 0.),
+                ..default()
+            },
+            ..default()
+        },
+        SplashCleanup,
+    ));
 
     // start loading config
     let config_handle: Handle<Config> = asset_server.load(CONFIG_ASSET_PATH);
@@ -111,7 +129,7 @@ fn system_preload_watch_config(
                 .expect("Expected Config to be available after loading.");
             commands.insert_resource(config.clone());
             commands.remove_resource::<LoadingConfig>();
-            next_state.set(AppState::Splash);
+            next_state.set(AppState::Loading);
             info!("Config loaded");
         }
         _ => {
@@ -170,7 +188,7 @@ fn system_loading_setup(
         Text2dBundle {
             text: Text::from_section("Loading", state_text_style),
             transform: Transform {
-                translation: Vec3::new(0., -128., 0.),
+                translation: Vec3::new(0., -256., 0.),
                 ..default()
             },
             ..default()
@@ -188,7 +206,7 @@ fn system_loading_setup(
     commands.spawn((
         Text2dBundle {
             text: Text::from_section("", status_text_style),
-            transform: Transform::from_translation(Vec3::new(0., -256., 0.)),
+            transform: Transform::from_translation(Vec3::new(0., -256. - 128., 0.)),
             ..default()
         },
         StatusTextMarker,
@@ -222,7 +240,7 @@ fn system_loading_update(
     if loaded == loading.0.len() {
         // TODO: go to main menu when it's implemented
         info!("All assets loaded");
-        next_state.set(AppState::InGame)
+        next_state.set(AppState::Splash)
     }
 }
 

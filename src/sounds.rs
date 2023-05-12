@@ -18,9 +18,11 @@ pub struct SoundsPlugin;
 
 impl Plugin for SoundsPlugin {
     fn build(&self, app: &mut bevy::prelude::App) {
-        app.add_system(Self::system_spawn_sound_button.in_schedule(OnEnter(AppState::InGame)));
+        app.add_system(Self::system_spawn_sound_button.in_schedule(OnEnter(AppState::Splash)));
         app.add_system(Self::system_start_music.in_schedule(OnEnter(AppState::InGame)));
 
+        app.add_system(Self::system_handle_sound_button_clicked.in_set(OnUpdate(AppState::Splash)));
+        app.add_system(Self::system_update_sound_button.in_set(OnUpdate(AppState::Splash)));
         app.add_system(Self::system_handle_sound_button_clicked.in_set(OnUpdate(AppState::InGame)));
         app.add_system(Self::system_update_sound_button.in_set(OnUpdate(AppState::InGame)));
         app.add_system(Self::system_update_sound_volume.in_set(OnUpdate(AppState::InGame)));
@@ -71,10 +73,8 @@ impl SoundsPlugin {
         q.iter_mut()
             .flat_map(|mut listener| listener.0.drain().collect::<Vec<_>>())
             .for_each(|ev| {
-                info!("system_update_sound_state: mouse event {:?}", ev); // debug
                 if ev.just_pressed(MouseButton::Left) {
                     sound_on.0 = !sound_on.0;
-                    info!("system_update_sound_state: changed sound ({})", sound_on.0);
                 }
             });
     }

@@ -1,12 +1,16 @@
+use std::sync::{Arc, Mutex};
+
 use bevy::{
     prelude::{
         Commands, Component, Handle, Image, IntoSystemAppConfig, IntoSystemConfig, MouseButton,
-        OnEnter, OnUpdate, Plugin, Query, Res, ResMut, Resource, Transform, Vec3, With,
+        NonSend, OnEnter, OnExit, OnUpdate, Plugin, Query, Res, ResMut, Resource, Transform, Vec3,
+        With, World,
     },
     sprite::SpriteBundle,
     utils::default,
 };
-use bevy_kira_audio::{Audio, AudioControl, AudioInstance, AudioSource};
+use bevy_kira_audio::{Audio, AudioControl, AudioInstance, AudioPlugin, AudioSource};
+use web_sys::AudioContext;
 
 use crate::{
     app::AppState, collision::Collider, input::ClickListener, loading::AssetMap,

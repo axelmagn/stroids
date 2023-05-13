@@ -1,4 +1,5 @@
 use wasm_bindgen::prelude::wasm_bindgen;
+use web_sys::AudioContext;
 
 mod app;
 mod collision;
